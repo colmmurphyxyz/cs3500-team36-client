@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.Button?>
+<VBox alignment="center" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="xyz.colmmurphy.team36.controllers.Controller">
+    <Text fx:id="title">Hello!</Text>
+    <Button fx:id="button" text="Click Me!" onAction="#onButtonClick" />
+</VBox>
