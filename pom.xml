@@ -86,6 +86,11 @@
             <artifactId>javafx-fxml</artifactId>
             <version>17.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>17.0.1</version>
+        </dependency>
         <!-- Simple Log Facade For Java -->
         <dependency>
             <groupId>org.slf4j</groupId>
