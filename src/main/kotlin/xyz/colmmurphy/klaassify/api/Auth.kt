@@ -1,4 +1,4 @@
-package xyz.colmmurphy.team36.api
+package xyz.colmmurphy.klaassify.api
 
 import se.michaelthelin.spotify.SpotifyApi
 import se.michaelthelin.spotify.enums.AuthorizationScope

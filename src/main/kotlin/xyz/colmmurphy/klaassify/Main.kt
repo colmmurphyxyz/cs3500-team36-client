@@ -1,4 +1,4 @@
-package xyz.colmmurphy.team36
+package xyz.colmmurphy.klaassify
 
 fun main(args: Array<String>) {
 //    val code = authorizationCodeUriRequest()

@@ -1,4 +1,4 @@
-package xyz.colmmurphy.team36.controllers
+package xyz.colmmurphy.klaasify.controllers
 
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader

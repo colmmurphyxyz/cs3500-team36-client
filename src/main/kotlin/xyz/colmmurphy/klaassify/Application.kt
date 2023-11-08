@@ -1,4 +1,4 @@
-package xyz.colmmurphy.team36
+package xyz.colmmurphy.klaassify
 
 import javafx.application.Application
 import javafx.fxml.FXMLLoader

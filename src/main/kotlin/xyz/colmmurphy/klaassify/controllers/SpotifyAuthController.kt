@@ -1,4 +1,4 @@
-package xyz.colmmurphy.team36.controllers
+package xyz.colmmurphy.klaassify.controllers
 
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
