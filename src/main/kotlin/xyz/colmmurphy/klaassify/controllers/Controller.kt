@@ -20,7 +20,7 @@ class Controller {
 
     fun onButtonClick() {
         val root: Parent = FXMLLoader.load<Parent>(
-            this::class.java.classLoader.getResource("spotify-redirect.fxml")
+            this::class.java.classLoader.getResource("view/spotify-redirect.fxml")
         )
 
         val window: Stage = button.scene.window as Stage
