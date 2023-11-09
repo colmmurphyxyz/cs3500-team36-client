@@ -5,9 +5,9 @@ import javafx.beans.value.ObservableValue
 import javafx.fxml.FXML
 import javafx.scene.web.WebEngine
 import javafx.scene.web.WebView
-import xyz.colmmurphy.team36.api.authorizationCodeUriRequest
 import java.net.URI
 import javafx.concurrent.Worker.State;
+import xyz.colmmurphy.klaassify.api.authorizationCodeUriRequest
 
 
 class SpotifyAuthController {
@@ -18,7 +18,7 @@ class SpotifyAuthController {
     fun initialize() {
         webEngine = webView.engine
         println(webEngine.userAgent)
-        val uri: URI = authorizationCodeUriRequest().execute()
+        val uri: URI = authorizationCodeUriRequest()
         webEngine.load(uri.toString())
 //        webEngine.loadWorker.stateProperty().addListener(
 //            object : ChangeListener<State?>() {
