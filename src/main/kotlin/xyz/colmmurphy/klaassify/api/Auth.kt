@@ -13,6 +13,9 @@ const val SECRET: String = "2fc8c6ddc39a461b99028a3ce80589c8"
 const val REDIRECT_URI = "http://localhost:8080"
 var code: String = ""
 
+/**
+ * generates a pseodo-random string of characters and digits to be used as a code verifier for PKCE Auth purposes
+ */
 fun generateCodeVerifier(length: Int=0): String {
     val l = if (length <= 0) Random.Default.nextInt(43, 129) else length
     val possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -31,6 +34,10 @@ val spotifyApi = SpotifyApi.Builder()
     .setRedirectUri(URI(REDIRECT_URI))
     .build()
 
+/**
+ * Generates a request for a login link from potify with the given scopes
+ * @return AuthorizationCodeUriRequest for PKCE authorization
+ */
 fun authorizationCodeUriRequest(): AuthorizationCodeUriRequest = spotifyApi.authorizationCodePKCEUri(codeChallenge)
     .scope(
         AuthorizationScope.USER_READ_PRIVATE,
@@ -45,6 +52,10 @@ fun authorizationCodeUriRequest(): AuthorizationCodeUriRequest = spotifyApi.auth
     .build()
 
 
+/**
+ * Executes the authorizationUriRequest and receives a login link from Spotify
+ * @return Authorization login page URI link
+ */
 fun authorizationCodeUri(): URI {
     val uri = authorizationCodeUriRequest().execute()
     println("login link: $uri")
