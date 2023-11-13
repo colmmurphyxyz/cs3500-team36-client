@@ -66,7 +66,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.22.2</version>
             </plugin>
-            <!--            maven shade plugin -->
+            <!-- maven shade plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -76,7 +76,7 @@
                         <!-- add Main-Class to manifest file -->
                         <transformer
                                 implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>xyz.colmmurphy.team36.MainKt</mainClass>
+                            <mainClass>xyz.colmmurphy.klaassify.MainKt</mainClass>
                         </transformer>
                     </transformers>
                 </configuration>
@@ -93,17 +93,16 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>se.michaelthelin.spotify</groupId>
+            <artifactId>spotify-web-api-java</artifactId>
+            <version>8.3.3</version>
+        </dependency>
         <!-- JavaFX -->
         <dependency>
             <groupId>io.socket</groupId>
             <artifactId>socket.io-client</artifactId>
             <version>2.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.json</groupId>
-                    <artifactId>json</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -143,7 +142,7 @@
         <!-- Kotlin standard library -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <artifactId>kotlin-stdlib</artifactId>
             <version>1.8.10</version>
         </dependency>
     </dependencies>

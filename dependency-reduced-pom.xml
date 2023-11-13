@@ -53,7 +53,7 @@
         <configuration>
           <transformers>
             <transformer>
-              <mainClass>xyz.colmmurphy.team36.MainKt</mainClass>
+              <mainClass>xyz.colmmurphy.klaassify.MainKt</mainClass>
             </transformer>
           </transformers>
         </configuration>
