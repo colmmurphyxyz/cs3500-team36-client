@@ -6,8 +6,13 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.stage.Stage
 
-
+/**
+ * Klaassify Client
+ */
 class Client : Application() {
+    /**
+     * Creates a displays a scene with from main-view.fxml
+     */
     override fun start(primaryStage: Stage) {
         primaryStage.title = "CS3500 Team 36 client"
         val root = FXMLLoader.load<Parent>(Client::class.java.classLoader.getResource("view/main-view.fxml"))
