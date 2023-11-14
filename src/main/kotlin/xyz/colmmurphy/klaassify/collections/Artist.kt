@@ -2,7 +2,7 @@ package xyz.colmmurphy.klaassify.collections
 
 /**
  * Data class to represent an artist
- * Implements the IVertex interface for use in a graph
+ * Extends the Vertex class for use in a graph
  */
 data class Artist(
     val name: String,
@@ -11,7 +11,7 @@ data class Artist(
     val spotifyUrl: String,
     val popularity: Int,
     val images: List<ArtistImage>
-) : IVertex {
+) : Vertex() {
     override val element: Artist
         get() = this
 }

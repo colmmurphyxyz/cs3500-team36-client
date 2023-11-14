@@ -1,28 +1,35 @@
 package xyz.colmmurphy.klaassify.collections
 
-class Edge(
-           override val v1: IVertex,
-           override val v2: IVertex,
-           override val element: String
-) : IEdge {
+class Edge<T>(
+    val v1: Vertex,
+    val v2: Vertex,
+    val element: T
+) {
+    override fun toString(): String = "$v1 <--$element--> $v2"
 
-    override fun equalTo(other: IEdge): Boolean {
-        return (this.v1 == other.v1 && this.v2 == other.v2) || (this.v1 == other.v2 && this.v2 == other.v1)
+    override fun equals(other: Any?): Boolean {
+        return if (other is Edge<*>) {
+            (v1 == other.v1 && v2 == other.v2)
+                    || (v1 == other.v2 && v2 == other.v1)
+                    && element == other.element
+        } else {
+            super.equals(other)
+        }
     }
 
-    override fun toString(): String {
-        return "$v1<-->$v2: $element"
+    override fun hashCode(): Int {
+        var result = v1.hashCode()
+        result = 31 * result + v2.hashCode()
+        result = 31 * result + element.hashCode()
+        return result
     }
 
-    override fun vertices(): Pair<IVertex, IVertex> {
-        // uses Kotlin's 'to' operator to create a Pair object of the two vertices
-        return v1 to v2
-    }
+    private val vertices: Pair<Vertex, Vertex>
+        get() = v1 to v2
 
-    override fun opposite(v: IVertex): IVertex? {
+    fun opposite(v: Vertex): Vertex? {
         if (v == v1) return v2
         if (v == v2) return v1
         return null
     }
-
 }
