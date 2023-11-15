@@ -11,5 +11,5 @@ abstract class Graph<V : Vertex, T> {
     abstract fun degree(v: V): Int
     abstract fun addVertex(vertex: V)
     abstract fun addEdge(v1: V, v2: V, element: T): Edge<T>
-    abstract fun removeVertex(v: Vertex)
+    abstract fun removeVertex(v: V)
 }

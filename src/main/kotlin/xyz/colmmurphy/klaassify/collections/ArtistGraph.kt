@@ -121,7 +121,11 @@ class ArtistGraph(
         return newEdge
     }
 
-    override fun removeVertex(v: Vertex) {
+    /**
+     * Remove a vertex and all edges incident on it
+     * @param v vertex to be rmeoved
+     */
+    override fun removeVertex(v: Artist) {
         for (edge in adjacencyList[v]!!) {
             adjacencyList[edge.opposite(v)]!!.remove(edge)
         }
