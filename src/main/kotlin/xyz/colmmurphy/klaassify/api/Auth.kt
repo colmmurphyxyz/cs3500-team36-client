@@ -1,10 +1,14 @@
 package xyz.colmmurphy.klaassify.api
 
+import javafx.application.Application
+import javafx.scene.image.Image
 import se.michaelthelin.spotify.SpotifyApi
 import se.michaelthelin.spotify.enums.AuthorizationScope
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest
 import se.michaelthelin.spotify.requests.authorization.authorization_code.pkce.AuthorizationCodePKCERequest
+import xyz.colmmurphy.klaassify.Client
+import xyz.colmmurphy.klaassify.collections.ArtistImage
 import java.net.URI
 import kotlin.random.Random
 
@@ -35,7 +39,7 @@ val spotifyApi = SpotifyApi.Builder()
     .build()
 
 /**
- * Generates a request for a login link from potify with the given scopes
+ * Generates a request for a login link from Spotify with the given scopes
  * @return AuthorizationCodeUriRequest for PKCE authorization
  */
 fun authorizationCodeUriRequest(): AuthorizationCodeUriRequest = spotifyApi.authorizationCodePKCEUri(codeChallenge)
@@ -46,7 +50,7 @@ fun authorizationCodeUriRequest(): AuthorizationCodeUriRequest = spotifyApi.auth
         AuthorizationScope.USER_LIBRARY_READ,
         AuthorizationScope.USER_READ_EMAIL,
         AuthorizationScope.USER_READ_RECENTLY_PLAYED,
-        AuthorizationScope.USER_TOP_READ
+        AuthorizationScope.USER_TOP_READ,
     )
     .show_dialog(true)
     .build()
@@ -73,12 +77,26 @@ fun authorizationCode() {
     spotifyApi.refreshToken = authorizationCodeCredentials.refreshToken
     println("Obtained access token ${spotifyApi.accessToken} and refresh token ${spotifyApi.refreshToken}. \n" +
             "Expires in ${authorizationCodeCredentials.expiresIn}")
-    val usersTopArtists = spotifyApi.usersTopArtists
-        .time_range("medium_term")
-        .limit(100)
-        .build()
-        .execute()
-
-    println("total: ${usersTopArtists.total}")
-    println(usersTopArtists.items.joinToString { it -> "${it.name}: [${it.genres.joinToString(",")}]\n" })
+    // example code to get a user's top artists and crete a graph from it
+    // doesn't belong in this function scope
+//    val usersTopArtists = spotifyApi.usersTopArtists
+//        .time_range("medium_term")
+//        .limit(100)
+//        .build()
+//        .execute()
+//
+//    println("total: ${usersTopArtists.total}")
+//    println(usersTopArtists.items.joinToString(separator="\n") { it -> "${it.name}: [${it.genres.joinToString()}]" })
+//    usersTopArtists.items.forEach {
+//        val newArtist = xyz.colmmurphy.klaassify.collections.Artist(it.name,
+//            it.genres.toSet(),
+//            it.followers.total.toLong(),
+//            it.uri,
+//            it.popularity,
+//            listOf<Image>()
+//        )
+//        Client.artistGraph.addVertexAndCreateEdges(newArtist)
+//    }
+//    println("created graph")
+//    println(Client.artistGraph)
 }

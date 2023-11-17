@@ -25,7 +25,7 @@ class SpotifyAuthController {
         println(webEngine.userAgent)
         val uri: URI = authorizationCodeUri()
         webEngine.load(uri.toString())
-        // add a listener to run a function every time the window.loaction property changes
+        // add a listener to run a function every time the window.location property changes
         webEngine.locationProperty().addListener(ChangeListener<String>() { observableValue, oldValue, newValue ->
             println("redirected from $oldValue to $newValue")
             // if spotify login was successful, spotify will redirect us to REDIRECT_URI

@@ -5,6 +5,9 @@ import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.stage.Stage
+import xyz.colmmurphy.klaassify.collections.Artist
+import xyz.colmmurphy.klaassify.collections.ArtistGraph
+import xyz.colmmurphy.klaassify.collections.commonGenre
 
 /**
  * Klaassify Client
@@ -25,5 +28,9 @@ class Client : Application() {
         // necessary here as the main function accepts an array of Strings as params and the JavaFX launch method
         // requires `vararg String` as its parameter type
         launch(*args)
+    }
+
+    companion object {
+        val artistGraph = ArtistGraph(commonGenre)
     }
 }

@@ -1,11 +1,15 @@
 package xyz.colmmurphy.klaassify.collections
 
-typealias GenreRelationEdge = Edge<Set<String>>
-
+/**
+ * CLass to represent a Graph of artists in the user's listening catalogue
+ * with edges constructed programmatically via the supplied relation predicate
+ * @param vertexRelationPredicate function that defines if two artists should be related
+ *      can be expanded to provide support for different formats of data visualisation
+ */
 class ArtistGraph(
-    val vertexRelationPredicate: (Artist, Artist) -> Set<String>
-): Graph<Artist, Set<String>>() {
-    private val adjacencyList: HashMap<Artist, MutableList<GenreRelationEdge>> = hashMapOf()
+    val vertexRelationPredicate: (Artist, Artist) -> Int
+): Graph<Artist, Int>() {
+    private val adjacencyList: HashMap<Artist, MutableList<Edge<Int>>> = hashMapOf()
     /**
      * String representation of the graph.
      * Containing all vertices and edges, and the amount of each
@@ -35,9 +39,9 @@ class ArtistGraph(
     /**
      * List of edges in the graph
      */
-    override val edges: List<GenreRelationEdge>
+    override val edges: List<Edge<Int>>
         get() {
-            val e = mutableSetOf<GenreRelationEdge>()
+            val e = mutableSetOf<Edge<Int>>()
             for (v in adjacencyList.keys) {
                 e.addAll(getEdges(v))
             }
@@ -56,7 +60,7 @@ class ArtistGraph(
      * @param v2 Artist
      * @return edge incident on v1 and v2 if one exists, nul otherwise
      */
-    override fun getEdge(v1: Artist, v2: Artist): GenreRelationEdge? {
+    override fun getEdge(v1: Artist, v2: Artist): Edge<Int>? {
         val e = adjacencyList.getOrElse(v1) { return null }
         for (edge in e) {
             if (v2 == edge.opposite(v1)) return edge
@@ -69,7 +73,7 @@ class ArtistGraph(
      * @param v Artist
      * @return List if all edges incident on v
      */
-    override fun getEdges(v: Artist): List<GenreRelationEdge> {
+    override fun getEdges(v: Artist): List<Edge<Int>> {
         return adjacencyList[v]!!
     }
 
@@ -87,7 +91,7 @@ class ArtistGraph(
      * @param vertex artist from which to create the vertex
      */
     override fun addVertex(vertex: Artist) {
-        adjacencyList[vertex] = mutableListOf<GenreRelationEdge>()
+        adjacencyList[vertex] = mutableListOf<Edge<Int>>()
     }
 
     /**
@@ -96,12 +100,12 @@ class ArtistGraph(
      * @param artist new vertex to add
      * @return List of all new edges created
      */
-    fun addVertexAndCreateEdges(artist: Artist): List<GenreRelationEdge> {
+    fun addVertexAndCreateEdges(artist: Artist): List<Edge<Int>> {
         addVertex(artist)
-        val newEdges = mutableListOf<GenreRelationEdge>()
+        val newEdges = mutableListOf<Edge<Int>>()
         for (v in vertices) {
             val commonGenres = vertexRelationPredicate(artist, v)
-            if (commonGenres.isNotEmpty()) {
+            if (commonGenres > 0) {
                 newEdges.add(addEdge(artist, v, commonGenres))
             }
         }
@@ -114,8 +118,8 @@ class ArtistGraph(
      * @param v2 vertex on which the new edge will be incident
      * @return newly created edge
      */
-    override fun addEdge(v1: Artist, v2: Artist, element: Set<String>): GenreRelationEdge {
-        val newEdge = GenreRelationEdge(v1, v2, element)
+    override fun addEdge(v1: Artist, v2: Artist, element: Int): Edge<Int> {
+        val newEdge = Edge<Int>(v1, v2, element)
         adjacencyList[v1]!!.add(newEdge)
         adjacencyList[v2]!!.add(newEdge)
         return newEdge

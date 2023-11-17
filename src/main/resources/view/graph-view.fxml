@@ -2,9 +2,13 @@
 
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.canvas.Canvas?>
 <VBox alignment="center" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="xyz.colmmurphy.klaassify.controllers.GraphViewController">
     <Text fx:id="title">Graph of your music taste</Text>
     <Text fx:id="subtitle">We sampled {N} different artists, spanning {K} distinct genres,
         with {M} genre connections between these artists</Text>
+    <Canvas fx:id="canvas" width="800" height="800" style="-fx-border-style: pink">
+
+    </Canvas>
 </VBox>
