@@ -11,9 +11,7 @@ import javafx.scene.web.WebView
 import javafx.stage.Stage
 import java.net.URI
 import xyz.colmmurphy.klaassify.api.REDIRECT_URI
-import xyz.colmmurphy.klaassify.api.authorizationCode
 import xyz.colmmurphy.klaassify.api.code
-import xyz.colmmurphy.klaassify.api.authorizationCodeUri
 
 class SpotifyAuthController {
     @FXML
@@ -23,7 +21,8 @@ class SpotifyAuthController {
     fun initialize() {
         webEngine = webView.engine
         println(webEngine.userAgent)
-        val uri: URI = authorizationCodeUri()
+//        val uri: URI = authorizationCodeUri()
+        val uri: URI = URI("http://localhost:3000")
         webEngine.load(uri.toString())
         // add a listener to run a function every time the window.location property changes
         webEngine.locationProperty().addListener(ChangeListener<String>() { observableValue, oldValue, newValue ->
@@ -35,7 +34,7 @@ class SpotifyAuthController {
             // set the code variable in the AuthKt class and use it to obtain an access token
             code = newValue.substringAfter('=')
             // obtain access and refresh tokens, then change the scene
-            authorizationCode()
+//            authorizationCode()
 
             val root: Parent = FXMLLoader.load<Parent>(
                 this::class.java.classLoader.getResource("view/graph-view.fxml")

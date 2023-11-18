@@ -134,6 +134,14 @@ class ArtistGraph(
             adjacencyList[edge.opposite(v)]!!.remove(edge)
         }
         adjacencyList.remove(v)
+        adjacencyList.keys.removeAll { it -> degree(it) == 0 }
     }
 
+    /**
+     * determine if two given vertices are adjacent
+     * @return true if there exists an edge between v1 and v2
+     */
+    fun areAdjacent(v1: Artist, v2: Artist): Boolean {
+        return getEdge(v1, v2) != null
+    }
 }

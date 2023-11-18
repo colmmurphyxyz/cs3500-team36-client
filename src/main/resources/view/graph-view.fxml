@@ -8,7 +8,9 @@
     <Text fx:id="title">Graph of your music taste</Text>
     <Text fx:id="subtitle">We sampled {N} different artists, spanning {K} distinct genres,
         with {M} genre connections between these artists</Text>
-    <Canvas fx:id="canvas" width="800" height="800" style="-fx-border-style: pink">
+    <VBox maxWidth="800" maxHeight="800" style="-fx-border-color: red; -fx-border-width: 10; -fx-border-style: solid;">
+        <Canvas fx:id="canvas" width="800" height="800">
 
-    </Canvas>
+        </Canvas>
+    </VBox>
 </VBox>
