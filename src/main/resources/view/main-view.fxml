@@ -5,6 +5,10 @@
 <?import javafx.scene.control.Button?>
 <VBox alignment="center" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="xyz.colmmurphy.klaassify.controllers.Controller">
-    <Text fx:id="title">Hello!</Text>
-    <Button fx:id="button" text="Click Me!" onAction="#onButtonClick" />
+    <Text fx:id="title">Welcome to Klassify!</Text>
+    <Text fx:id="info">Click the button below to login into Spotify to get your display some of your
+        Spoitfy data. When you click the button it will open up a browser window for you to procced with autheticationing
+        this app to use your specified spotify data</Text>
+
+    <Button fx:id="button" text="Login" onAction="#onButtonClick" />
 </VBox>
