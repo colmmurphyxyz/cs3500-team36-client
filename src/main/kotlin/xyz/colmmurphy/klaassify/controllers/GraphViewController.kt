@@ -20,13 +20,6 @@ class GraphViewController {
     lateinit var canvas: Canvas
 
     private val graph = Client.artistGraph
-    // constants
-    private val coolingFactor = 0.99
-    private val l = 20.0
-    private val cRep = 2.0
-    private val cAttr = 1.0
-    private val k = 10_000
-    private val epsilon = 10.0
 
     lateinit var positions: HashMap<Artist, DoubleArray>
 
@@ -72,11 +65,24 @@ class GraphViewController {
         for (i in graph.vertices) {
             val pos: DoubleArray = positions[i]!!
             gc.fillOval(pos[0] - 10.0, pos[1] - 10.0, 20.0, 20.0)
+            gc.fillText(i.name, pos[0] - 30, pos[1] + 30)
         }
         gc.stroke()
     }
 
+    /**
+     * Function to Render a graph
+     * @return hashmap containing vertices as keys, and their coordinates as double arrays
+     */
     private fun eadesSpringEmbedder(): HashMap<Artist, DoubleArray> {
+        // constants
+        val coolingFactor = 0.975
+        val l = 40.0
+        val cRep = 8.0
+        val cAttr = 4.0
+        val k = 10_000
+        val epsilon = 1.0
+
         val random = Random(System.currentTimeMillis())
         val p = hashMapOf(*graph.vertices.map {
             it to (doubleArrayOf(random.nextDouble() * canvas.width, random.nextDouble() * canvas.height))
@@ -91,16 +97,21 @@ class GraphViewController {
             val dy = pu[1] - pv[1]
             return doubleArrayOf(cRep / (dx * dx), cRep / (dy * dy))
         }
-
+        fun centerForce(u: Artist): DoubleArray {
+            val dx = abs(p[u]!![0] - canvas.width / 2)
+            val dy = abs(p[u]!![1] - canvas.width / 2)
+            return doubleArrayOf(2000 / (dx * dx), 2000 / (dy * dy))
+        }
         fun fattr(u: Artist, v: Artist): DoubleArray {
             if (u == v) return doubleArrayOf(0.0, 0.0)
             val pu = p[u]!!
             val pv = p[v]!!
             val dx = abs(pu[0] - pv[0])
             val dy = abs(pu[1] - pv[1])
-            val fx = cAttr * log2(dx / l)
-            val fy = cAttr * log2(dy / l)
-            return doubleArrayOf(fx, fy)
+            val fx = cAttr * ln(dx / l)
+            val fy = cAttr * ln(dy / l)
+            val fr = frep(u, v)
+            return doubleArrayOf(fx - fr[0], fy - fr[1])
         }
 
         var prevMaxForce = 0.0
@@ -116,17 +127,18 @@ class GraphViewController {
                     sumForcesRep[1] += f[1]
                 }
                 val sumForcesAttr = doubleArrayOf(0.0, 0.0)
-                for (v in graph.vertices) {
+                for (e in graph.getEdges(u)) {
+                    val v = e.opposite(u)!! as Artist
                     // no attractive force between non-adjacent vertices
                     if (!graph.areAdjacent(u, v)) continue
                     val f = fattr(u, v)
-                    val fr = frep(u, v)
-                    sumForcesAttr[0] += f[0] - fr[0]
-                    sumForcesAttr[1] += f[1] - fr[0]
+                    sumForcesAttr[0] += f[0]
+                    sumForcesAttr[1] += f[1]
                 }
+                val fCenter = centerForce(u)
                 forces[u] = doubleArrayOf(
-                    sumForcesRep[0] + sumForcesAttr[0],
-                    sumForcesRep[1] + sumForcesAttr[1]
+                    sumForcesRep[0] + sumForcesAttr[0] + fCenter[0],
+                    sumForcesRep[1] + sumForcesAttr[1] + fCenter[1]
                 )
             }
             // update positions
@@ -147,7 +159,7 @@ class GraphViewController {
             if (maxForce < epsilon) {
                 return p
             }
-            if (abs(maxForce - prevMaxForce) < 0.001) {
+            if (maxForce == prevMaxForce) {
                 return p
             }
             prevMaxForce = maxForce
