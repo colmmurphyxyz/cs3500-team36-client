@@ -12,36 +12,10 @@ import javafx.stage.Stage
 import java.net.URI
 import xyz.colmmurphy.klaassify.api.REDIRECT_URI
 import xyz.colmmurphy.klaassify.api.code
+import java.awt.Desktop
 
 class SpotifyAuthController {
-    @FXML
-    lateinit var webView: WebView
-    lateinit var webEngine: WebEngine
-
-    fun initialize() {
-        webEngine = webView.engine
-        println(webEngine.userAgent)
-//        val uri: URI = authorizationCodeUri()
-        val uri: URI = URI("http://localhost:3000")
-        webEngine.load(uri.toString())
-        // add a listener to run a function every time the window.location property changes
-        webEngine.locationProperty().addListener(ChangeListener<String>() { observableValue, oldValue, newValue ->
-            println("redirected from $oldValue to $newValue")
-            // if spotify login was successful, spotify will redirect us to REDIRECT_URI
-            // with the special code in the URL params
-            if (!newValue.startsWith(REDIRECT_URI)) return@ChangeListener
-            // we have the special code, we save this, and can use it to generate an access token
-            // set the code variable in the AuthKt class and use it to obtain an access token
-            code = newValue.substringAfter('=')
-            // obtain access and refresh tokens, then change the scene
-//            authorizationCode()
-
-            val root: Parent = FXMLLoader.load<Parent>(
-                this::class.java.classLoader.getResource("view/graph-view.fxml")
-            )
-
-            val window: Stage = webView.scene.window as Stage
-            window.scene = Scene(root, 1000.0, 1000.0)
-        })
-    }
+    //Will have to be passed in from socket
+    val url = "http//localhost:3000/login"
+    fun initialize() {}
 }

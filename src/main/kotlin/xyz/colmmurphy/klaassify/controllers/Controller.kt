@@ -7,6 +7,9 @@ import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.text.Text
 import javafx.stage.Stage
+import xyz.colmmurphy.klaassify.api.ClientConnect
+import java.awt.Desktop
+import java.net.URI
 
 /**
  * Controller for the main view, or the landing page to the application
@@ -17,8 +20,23 @@ class Controller {
     @FXML
     lateinit var title: Text
 
+    val socket : ClientConnect = ClientConnect()
+    public var loginLink : String = "";
+    var userID : String = "myid"
     fun initialize() {
+        button.isVisible=false
+        socket.connect()
+        println("requesting token")
+        socket.requestAuthToken(userID)
 
+        socket.onEvent("authorized") {
+            println("Handshake complete")
+            //move view to graph
+        }
+        socket.onEvent("login_link") { eventData ->
+            button.isVisible=true
+            loginLink=eventData
+        }
     }
 
     /**
@@ -26,11 +44,20 @@ class Controller {
      * defined in spotify-redirect.fxml
      */
     fun onButtonClick() {
-        val root: Parent = FXMLLoader.load<Parent>(
-            this::class.java.classLoader.getResource("view/spotify-redirect.fxml")
-        )
+        openBrowser(loginLink)
+    }
 
-        val window: Stage = button.scene.window as Stage
-        window.scene = Scene(root, 1000.0, 1000.0)
+    private fun openBrowser(url: String){
+
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            try {
+                val uri = URI(url)
+                Desktop.getDesktop().browse(uri)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        } else {
+            println("Desktop browsing is not supported on this platform.")
+        }
     }
 }
