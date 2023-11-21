@@ -31,9 +31,9 @@ class Controller {
 
         socket.onEvent("authorized") {
             println("Handshake complete")
+            //move view to graph
         }
         socket.onEvent("login_link") { eventData ->
-            //move to graph view and pass on data?
             button.isVisible=true
             loginLink=eventData
         }
