@@ -6,7 +6,9 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import xyz.colmmurphy.klaassify.Client
 import xyz.colmmurphy.klaassify.collections.Artist
+import java.lang.Math.pow
 import java.lang.System.gc
+import kotlin.concurrent.fixedRateTimer
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -21,65 +23,210 @@ class GraphViewController {
 
     private val graph = Client.artistGraph
 
-    lateinit var positions: HashMap<Artist, DoubleArray>
+    object eadesSpringEmbedder {
+        private val graph = Client.artistGraph
+        private const val idealLength = 75.0
+        private const val cRep = 2.0
+        private const val cAttr = 1.0
+        private const val epsilon = 10.0
+        private const val coolingFactor = 0.9875
+        private var delta = 1.0
+        var iterationsDone = 0
+        var positions: MutableMap<Artist, DoubleArray> = mutableMapOf(
+            *graph.vertices.map {
+                it to (doubleArrayOf(0.0, 0.0))
+            }.toTypedArray()
+        )
 
-    init {
+        private var forces: MutableMap<Artist, DoubleArray> = mutableMapOf(
+            *graph.vertices.map {
+                it to (doubleArrayOf(0.0, 0.0))
+            }.toTypedArray()
+        )
 
+        private val random = Random(System.currentTimeMillis())
+        /**
+         * Reset all variables. initialize positions map to random coordinates
+         */
+        fun reset() {
+            delta = 1.0
+            iterationsDone = 0
+            positions = hashMapOf(
+                *graph.vertices.map {
+                    it to doubleArrayOf(random.nextDouble() * 3500, random.nextDouble() * 3500)
+                }.toTypedArray()
+            )
+            forces = hashMapOf(
+                *graph.vertices.map {
+                    it to doubleArrayOf(0.0, 0.0)
+                }.toTypedArray()
+            )
+        }
+
+        fun fattr(u: Artist, v: Artist): DoubleArray {
+            val pu = positions[u]!!
+            val pv = positions[v]!!
+            val dx = pv[0] - pu[0]
+            val dy = pv[1] - pu[1]
+            // displacement vector = [ dx dy ]
+            val distance = sqrt( (dx * dx) + (dy * dy) )
+            val force = cAttr * log2(distance / idealLength)
+            return doubleArrayOf(
+                force * (dx / distance),
+                force * (dy / distance)
+            )
+        }
+
+        fun frep(u: Artist, v: Artist): DoubleArray {
+            val pu = positions[u]!!
+            val pv = positions[v]!!
+            val dx = pv[0] - pu[0]
+            val dy = pv[1] - pu[1]
+//            val dx = abs(pu[0] - pv[0])
+//            val dy = abs(pu[1] - pv[1])
+            // displacement vector = [ dx dy ]
+            val distance = sqrt( (dx * dx) + (dy * dy) )
+            val force = cRep / (distance * distance)
+            return doubleArrayOf(force * (dx / distance), force * (dy / distance))
+        }
+
+
+        fun doOneIteration() {
+            println("on iteration $iterationsDone")
+            // update forces
+            for (u in graph.vertices) {
+                val sumForcesRep = doubleArrayOf(0.0, 0.0)
+                for (v in graph.vertices) {
+                    if (u == v) continue
+                    val (fx, fy) = frep(u, v)
+                    sumForcesRep[0] += fx
+                    sumForcesRep[1] += fy
+                }
+                forces[u]!![0] = sumForcesRep[0]
+                forces[u]!![1] = sumForcesRep[1]
+                val sumForcesAttr = doubleArrayOf(0.0, 0.0)
+                for (e in graph.getEdges(u)) {
+                    val v = e.opposite(u) as Artist
+                    if (u == v) continue
+                    val (fx, fy) = fattr(u, v)
+                    val (frx, fry) = frep(u, v)
+                    sumForcesAttr[0] += fx - frx
+                    sumForcesAttr[1] += fy - fry
+                }
+                forces[u]!![0] += forces[u]!![0] + sumForcesAttr[0]
+                forces[u]!![1] += forces[u]!![1] + sumForcesAttr[1]
+            }
+            // update positions
+            for (u in graph.vertices) {
+//                positions[u] = positions[u]!! + delta * forces[u]
+                positions[u]!![0] += delta * forces[u]!![0]
+                positions[u]!![1] += delta * forces[u]!![1]
+            }
+            // update delta
+            delta *= coolingFactor
+            iterationsDone += 1
+            // find max force, print it
+            var maxForce = 0.0
+            for (i in forces.values) {
+                if (abs(i[0]) > abs(maxForce)) maxForce = i[0]
+                if (abs(i[1]) > abs(maxForce)) maxForce = i[1]
+            }
+            println("strongest force: $maxForce")
+        }
     }
-    fun initialize() {
-        val random = Random(System.currentTimeMillis())
 
-        positions = eadesSpringEmbedder()
-
-        for (v in graph.vertices) {
-            println("${v.name} - ${graph.degree(v)}")
+    private fun drawGraph(p: MutableMap<Artist, DoubleArray>) {
+        // scale coords
+        var maxValue = 1.0
+        for (i in p.values) {
+            if (i[0] > maxValue) maxValue = i[0]
+            if (i[1] > maxValue) maxValue = i[1]
         }
+        val scalingFactor = (canvas.width) / maxValue
 
-        // perform scaling so that the whole graph fits inside the frame
-        // find the largest coordinate and scale all coordinates equally such that this largest coord is now 800
-        var largestCoordinate = 0.0
-        for (p in positions.values) {
-            if (p[0] > largestCoordinate) largestCoordinate = p[0]
-            if (p[1] > largestCoordinate) largestCoordinate = p[1]
-        }
-        for (key in positions.keys) {
-            positions[key]!![0] *= 800.0 / largestCoordinate
-            positions[key]!![1] *= 800.0 / largestCoordinate
-        }
+        val scale: (Double) -> Double = {i -> (i * scalingFactor)}
 
-        // draw graph
+        // draw edges
         val gc = canvas.graphicsContext2D
         gc.clearRect(0.0, 0.0, canvas.width, canvas.height)
-        // draw edges first
+        gc.stroke()
+        // draw edges
         gc.stroke = Color.BLACK
-        for (i in graph.vertices) {
-            for (e in graph.getEdges(i)) {
-                val j = e.opposite(i)
-                val posI = positions[i]!!
-                val posJ = positions[j]!!
-                gc.strokeLine(posI[0], posI[1], posJ[0], posJ[1])
-            }
+        for (e in graph.edges) {
+            val pu = p[e.v1]!!
+            val pv = p[e.v2]!!
+            gc.strokeLine(scale(pu[0]), scale(pu[1]), scale(pv[0]), scale(pv[1]))
         }
-        // Draw vertices
-        gc.fill = Color.CADETBLUE
+        // draw vertices
+        gc.fill = Color.BLUEVIOLET
         for (i in graph.vertices) {
-            val pos: DoubleArray = positions[i]!!
-            gc.fillOval(pos[0] - 10.0, pos[1] - 10.0, 20.0, 20.0)
-            gc.fillText(i.name, pos[0] - 30, pos[1] + 30)
+            val pos: DoubleArray = p[i]!!
+            gc.fillOval(scale(pos[0]) - 10.0, scale(pos[1]) - 10.0, 20.0, 20.0)
+//            gc.fillText(i.name, pos[0] - 30, pos[1] + 30)
         }
         gc.stroke()
+    }
+
+    private fun renderGraph() {
+        eadesSpringEmbedder.reset()
+        val k = 5_000
+        val frt = fixedRateTimer("graph render", period = 10L) {
+            if (eadesSpringEmbedder.iterationsDone < k) {
+                eadesSpringEmbedder.doOneIteration()
+                drawGraph(eadesSpringEmbedder.positions)
+            } else {
+                this.cancel()
+            }
+        }
+    }
+
+    fun initialize() {
+        renderGraph()
+//        val positions = eadesSpringEmbedder_old()
+//        // scaling
+//        var maxValue = 1.0
+//        for (i in positions.values) {
+//            if (i[0] > maxValue) maxValue = i[0]
+//            if (i[1] > maxValue) maxValue = i[1]
+//        }
+//        val scalingFactor = canvas.width / maxValue
+//        for (i in positions.values) {
+//            i[0] *= scalingFactor
+//            i[1] *= scalingFactor
+//        }
+//        // draw graph
+//        val gc = canvas.graphicsContext2D
+//        gc.clearRect(0.0, 0.0, canvas.width, canvas.height)
+//        // draw edges first
+//        gc.stroke = Color.BLACK
+//        for (i in graph.vertices) {
+//            for (e in graph.getEdges(i)) {
+//                val j = e.opposite(i)
+//                val posI = positions[i]!!
+//                val posJ = positions[j]!!
+//                gc.strokeLine(posI[0], posI[1], posJ[0], posJ[1])
+//            }
+//        }
+//        // Draw vertices
+//        gc.fill = Color.CADETBLUE
+//        for (i in graph.vertices) {
+//            val pos: DoubleArray = positions[i]!!
+//            gc.fillOval(pos[0] - 10.0, pos[1] - 10.0, 20.0, 20.0)
+//            gc.fillText(i.name, pos[0] - 30, pos[1] + 30)
+//        }
+//        gc.stroke()
     }
 
     /**
      * Function to Render a graph
      * @return hashmap containing vertices as keys, and their coordinates as double arrays
      */
-    private fun eadesSpringEmbedder(): HashMap<Artist, DoubleArray> {
+    private fun eadesSpringEmbedder_old(): HashMap<Artist, DoubleArray> {
         // constants
         val coolingFactor = 0.975
         val l = 40.0
         val cRep = 8.0
-        val cAttr = 4.0
+        val cAttr = 8.0
         val k = 10_000
         val epsilon = 1.0
 
