@@ -5,6 +5,7 @@ import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import xyz.colmmurphy.klaassify.Client
+import xyz.colmmurphy.klaassify.StartApplication
 import xyz.colmmurphy.klaassify.collections.Artist
 import java.lang.Math.pow
 import java.lang.System.gc
@@ -21,15 +22,15 @@ class GraphViewController {
     @FXML
     lateinit var canvas: Canvas
 
-    private val graph = Client.artistGraph
+    private val graph = StartApplication.artistGraph
 
     object eadesSpringEmbedder {
-        private val graph = Client.artistGraph
-        private const val idealLength = 75.0
+        private val graph = StartApplication.artistGraph
+        private const val idealLength = 50.0
         private const val cRep = 2.0
         private const val cAttr = 1.0
         private const val epsilon = 10.0
-        private const val coolingFactor = 0.9875
+        private const val coolingFactor = 0.99
         private var delta = 1.0
         var iterationsDone = 0
         var positions: MutableMap<Artist, DoubleArray> = mutableMapOf(
@@ -53,7 +54,7 @@ class GraphViewController {
             iterationsDone = 0
             positions = hashMapOf(
                 *graph.vertices.map {
-                    it to doubleArrayOf(random.nextDouble() * 3500, random.nextDouble() * 3500)
+                    it to doubleArrayOf(random.nextDouble() * 800, random.nextDouble() * 800)
                 }.toTypedArray()
             )
             forces = hashMapOf(
@@ -82,9 +83,7 @@ class GraphViewController {
             val pv = positions[v]!!
             val dx = pv[0] - pu[0]
             val dy = pv[1] - pu[1]
-//            val dx = abs(pu[0] - pv[0])
-//            val dy = abs(pu[1] - pv[1])
-            // displacement vector = [ dx dy ]
+            // displacement (column) vector = [ dx dy ]
             val distance = sqrt( (dx * dx) + (dy * dy) )
             val force = cRep / (distance * distance)
             return doubleArrayOf(force * (dx / distance), force * (dy / distance))
@@ -136,15 +135,45 @@ class GraphViewController {
     }
 
     private fun drawGraph(p: MutableMap<Artist, DoubleArray>) {
+        val drawCoords = mutableMapOf<Artist, DoubleArray>()
         // scale coords
-        var maxValue = 1.0
-        for (i in p.values) {
-            if (i[0] > maxValue) maxValue = i[0]
-            if (i[1] > maxValue) maxValue = i[1]
-        }
-        val scalingFactor = (canvas.width) / maxValue
+//        var maxDistFromCenter = 0.0
+//        for (i in p.values) {
+//            val dist = sqrt((i[0] - 400).pow(2) + (i[1] - 400).pow(2) )
+//            if (dist > maxDistFromCenter) maxDistFromCenter = dist
+//        }
+//        println("max distance from center: $maxDistFromCenter")
+//        val scaleFactor = 375.0 / maxDistFromCenter
+//        for (i in p.values) {
+//            // scale all coords such that the furthest node from the center is now 350.0 units from the center
+//            i[0] = ((i[0] - 400) * scaleFactor) + 400
+//            i[1] = ((i[1] - 400) * scaleFactor) + 400
+//        }
 
-        val scale: (Double) -> Double = {i -> (i * scalingFactor)}
+        // translate all coordinates such that the smallest x coordinate is 50 and the smallest y coordinate is 50
+        var minX = Double.MAX_VALUE
+        var minY = Double.MAX_VALUE
+        for (i in p.values) {
+            minX = min(minX, i[0])
+            minY = min(minY, i[1])
+        }
+        val xTrans = 10 - minX
+        val yTrans = 10 - minY
+        p.forEach { (artist, coords) ->
+            drawCoords[artist] = doubleArrayOf(coords[0] + xTrans, coords[1] + yTrans)
+        }
+        var maxX = 0.0
+        var maxY = 0.0
+        for (i in drawCoords.values) {
+            maxX = max(maxX, i[0])
+            maxY = max(maxY, i[1])
+        }
+        val scaleX = 750.0 / maxX
+        val scaleY = 750.0 / maxY
+        drawCoords.forEach { (artist, coords) ->
+            drawCoords[artist]!![0] *= scaleX
+            drawCoords[artist]!![1] *= scaleY
+        }
 
         // draw edges
         val gc = canvas.graphicsContext2D
@@ -153,24 +182,33 @@ class GraphViewController {
         // draw edges
         gc.stroke = Color.BLACK
         for (e in graph.edges) {
-            val pu = p[e.v1]!!
-            val pv = p[e.v2]!!
-            gc.strokeLine(scale(pu[0]), scale(pu[1]), scale(pv[0]), scale(pv[1]))
+            val pu = drawCoords[e.v1 as Artist]!!
+            val pv = drawCoords[e.v2 as Artist]!!
+            gc.strokeLine(pu[0], pu[1], pv[0], pv[1])
         }
+//        for (e in graph.edges) {
+//            val pu = p[e.v1]!!
+//            val pv = p[e.v2]!!
+//            gc.strokeLine(pu[0], pu[1], pv[0], pv[1])
+//        }
         // draw vertices
         gc.fill = Color.BLUEVIOLET
-        for (i in graph.vertices) {
-            val pos: DoubleArray = p[i]!!
-            gc.fillOval(scale(pos[0]) - 10.0, scale(pos[1]) - 10.0, 20.0, 20.0)
-//            gc.fillText(i.name, pos[0] - 30, pos[1] + 30)
+        for (node in drawCoords.keys) {
+            val d = drawCoords[node]!!
+            gc.fillOval(d[0] - 10.0, d[1] - 10.0, 20.0, 20.0)
         }
+//        for (i in graph.vertices) {
+//            val pos: DoubleArray = p[i]!!
+//            gc.fillOval(pos[0] - 10.0, pos[1] - 10.0, 20.0, 20.0)
+////            gc.fillText(i.name, pos[0] - 30, pos[1] + 30)
+//        }
         gc.stroke()
     }
 
     private fun renderGraph() {
         eadesSpringEmbedder.reset()
         val k = 5_000
-        val frt = fixedRateTimer("graph render", period = 10L) {
+        val frt = fixedRateTimer("graph render", period = 20L) {
             if (eadesSpringEmbedder.iterationsDone < k) {
                 eadesSpringEmbedder.doOneIteration()
                 drawGraph(eadesSpringEmbedder.positions)
