@@ -24,12 +24,16 @@ class ClientConnect() {
         val message = args[0].toString()
         notifyEventListener("login_link", message)
     }
+    private val onTopArtistsResponse = Emitter.Listener { args ->
+        val message = args[0].toString()
+        notifyEventListener("top_artists_response", message)
+    }
 
     init {
         // Set up listener for authorised event
         socket.on("authorized", onAuthorizedEvent)
         socket.on("login_link", onLoginLink)
-
+        socket.on("top_artists_response", onTopArtistsResponse)
     }
 
     // Function to send a message
@@ -40,7 +44,9 @@ class ClientConnect() {
     fun requestAuthToken(userID:String){
         socket.emit("request_auth_token", userID)
     }
-
+    fun requestTopArtist(userID:String){
+        socket.emit("top_artists_request",userID)
+    }
     // Register an event to event listeners
     fun onEvent(eventName: String, listener: (String) -> Unit) {
         eventListeners[eventName] = listener

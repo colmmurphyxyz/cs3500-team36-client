@@ -10,7 +10,6 @@
         with {M} genre connections between these artists</Text>
     <VBox maxWidth="800" maxHeight="800" style="-fx-border-color: red; -fx-border-width: 10; -fx-border-style: solid;">
         <Canvas fx:id="canvas" width="800" height="800">
-
         </Canvas>
     </VBox>
 </VBox>

@@ -21,4 +21,7 @@
         this app to use your specified Spotify data.
     </Text>
     <Button fx:id="button" text="Login" onAction="#onButtonClick" styleClass="login-button" prefWidth="200" prefHeight="40"/>
+    <Text fx:id="responseText" style="-fx-fill: white; -fx-font-size:15px;"> </Text>
+
+
 </VBox>
