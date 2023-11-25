@@ -6,7 +6,6 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
-import xyz.colmmurphy.klaassify.api.ClientConnect
 import xyz.colmmurphy.klaassify.collections.Artist
 import xyz.colmmurphy.klaassify.collections.ArtistGraph
 import xyz.colmmurphy.klaassify.collections.commonGenre

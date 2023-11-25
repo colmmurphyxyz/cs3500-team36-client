@@ -3,7 +3,7 @@ package xyz.colmmurphy.klaassify.controllers
 import javafx.fxml.FXML
 import javafx.scene.control.Button
 import javafx.scene.text.Text
-import xyz.colmmurphy.klaassify.api.ClientConnect
+import xyz.colmmurphy.klaassify.api.socket.SocketAPI
 import java.awt.Desktop
 import java.net.URI
 
@@ -18,7 +18,7 @@ class Controller {
     @FXML
     lateinit var responseText: Text
 
-    val socket : ClientConnect = ClientConnect()
+    val socket : SocketAPI = SocketAPI("http://localhost:3000")
     var loginLink : String = ""
     var userID : String = "myid"
     fun initialize() {
@@ -45,7 +45,7 @@ class Controller {
         }
 
         socket.onEvent("top_artists_response"){ eventData ->
-            println(eventData)
+            println("Top artists: $eventData")
         }
     }
 

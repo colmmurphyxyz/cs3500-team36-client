@@ -1,7 +1,5 @@
 package xyz.colmmurphy.klaassify
 
-import xyz.colmmurphy.klaassify.api.ClientConnect
-import xyz.colmmurphy.klaassify.api.SocketApi
 val user_id = "my_id"
 
 /**
