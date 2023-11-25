@@ -1,8 +1,12 @@
 package xyz.colmmurphy.klaassify.controllers
 
 import javafx.fxml.FXML
+import javafx.fxml.FXMLLoader
+import javafx.scene.Parent
+import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.text.Text
+import javafx.stage.Stage
 import xyz.colmmurphy.klaassify.api.socket.SocketAPI
 import java.awt.Desktop
 import java.net.URI
@@ -12,7 +16,9 @@ import java.net.URI
  */
 class Controller {
     @FXML
-    lateinit var button: Button
+    lateinit var loginButton: Button
+    @FXML
+    lateinit var logoutButton: Button
     @FXML
     lateinit var title: Text
     @FXML
@@ -22,7 +28,8 @@ class Controller {
     var loginLink : String = ""
     var userID : String = "myid"
     fun initialize() {
-        button.isVisible=false
+        loginButton.isVisible=false
+        logoutButton.isVisible=false
         socket.connect()
 
         println("requesting token")
@@ -31,16 +38,17 @@ class Controller {
 
         socket.onEvent("authorized") {
             println("Handshake complete")
-            button.isVisible=false
+            loginButton.isVisible=false
             responseText.isVisible=true
             responseText.text = "Authorization complete, redirecting..."
             //move view to graph
             socket.requestTopArtist(userID)
-
+            logoutButton.isVisible=true
         }
+
         socket.onEvent("login_link") { eventData ->
             loginLink=eventData
-            button.isVisible=true
+            loginButton.isVisible=true
             responseText.isVisible=false
         }
 
@@ -49,14 +57,13 @@ class Controller {
         }
     }
 
-    /**
-     * On pressing the button, this method is called, changing the active scene to the one
-     * defined in spotify-redirect.fxml
-     */
-    fun onButtonClick() {
+    fun onLoginButtonClick() {
         openBrowser(loginLink)
     }
-
+    fun onLogoutButtonClick() {
+        socket.logout(userID)
+        //REDIRECT TO THIS VIEW ? AND RELOAD CONTROLLER? IDK WHAT BEST PRACTISE IS
+    }
     private fun openBrowser(url: String){
         val os = System.getProperty("os.name").lowercase()
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {

@@ -20,8 +20,9 @@
         When you click the button, it will open a browser window for you to proceed with authenticating
         this app to use your specified Spotify data.
     </Text>
-    <Button fx:id="button" text="Login" onAction="#onButtonClick" styleClass="login-button" prefWidth="200" prefHeight="40"/>
+    <Button fx:id="loginButton" text="Login" onAction="#onLoginButtonClick" styleClass="login-button" prefWidth="200" prefHeight="40"/>
     <Text fx:id="responseText" style="-fx-fill: white; -fx-font-size:15px;"> </Text>
+    <Button fx:id="logoutButton" text="Logout" onAction="#onLogoutButtonClick" styleClass="login-button" prefWidth="200" prefHeight="40"/>
 
 
 </VBox>

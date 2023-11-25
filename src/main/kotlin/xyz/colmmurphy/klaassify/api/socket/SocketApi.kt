@@ -33,6 +33,9 @@ import io.socket.client.Socket
         fun requestTopArtist(userID:String){
             socket.emit("top_artists_request",userID)
         }
+        fun logout(userID: String){
+            socket.emit("logout",userID)
+        }
         // Register an event to event listeners
         fun onEvent(eventName: String, listener: (String) -> Unit) {
             eventListeners[eventName] = listener
