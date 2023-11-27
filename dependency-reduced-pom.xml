@@ -30,6 +30,18 @@
             </goals>
           </execution>
         </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-maven-serialization</artifactId>
+            <version>1.8.10</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <compilerPlugins>
+            <plugin>kotlinx-serialization</plugin>
+          </compilerPlugins>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -87,7 +99,7 @@
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-test-junit5</artifactId>
-      <version>1.6.21</version>
+      <version>1.8.10</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -122,10 +134,12 @@
     </dependency>
   </dependencies>
   <properties>
+    <serialization.version>1.6.1</serialization.version>
+    <kotlin.version>1.8.10</kotlin.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
     <maven.compiler.target>17</maven.compiler.target>
     <kotlin.code.style>official</kotlin.code.style>
-    <maven.compiler.source>17</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
   </properties>
 </project>
