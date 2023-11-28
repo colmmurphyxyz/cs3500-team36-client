@@ -28,10 +28,11 @@ class Controller {
     var loginLink : String = ""
     var userID : String = "myid"
     fun initialize() {
+
         loginButton.isVisible=false
         logoutButton.isVisible=false
         socket.connect()
-
+        socket.requestBenOrColmData("ben")
         println("requesting token")
         socket.requestAuthToken(userID)
         responseText.text = "Error receiving response from server (is server on?)"
@@ -54,6 +55,9 @@ class Controller {
 
         socket.onEvent("top_artists_response"){ eventData ->
             println("Top artists: $eventData")
+        }
+        socket.onEvent("response_ben_or_colm_data"){ eventData ->
+            println("BenOrColmData Data: $eventData")
         }
     }
 

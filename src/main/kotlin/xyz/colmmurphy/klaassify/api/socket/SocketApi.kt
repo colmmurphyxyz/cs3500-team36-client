@@ -4,8 +4,7 @@ import io.socket.client.IO
 import io.socket.client.Socket
 
     class SocketAPI(uri:String) {
-        //Event listeners could definetly be spread to different class but
-        // for my own dummy brain sake for now keep em in same file
+
         private val socket: Socket = IO.socket(uri)
         // Add socket to eventlisteners
         private val eventListeners =  SocketEventListeners(socket).getEventListeners();
@@ -32,6 +31,9 @@ import io.socket.client.Socket
         }
         fun requestTopArtist(userID:String){
             socket.emit("top_artists_request",userID)
+        }
+        fun requestBenOrColmData(benOrColm:String){
+            socket.emit("request_ben_or_colm_data",benOrColm)
         }
         fun logout(userID: String){
             socket.emit("logout",userID)
