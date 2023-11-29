@@ -33,7 +33,7 @@ class StartApplication : Application() {
         private fun loadTestGraph() {
             val artists = hashMapOf<Int, Artist>()
             for (i in 0..20) {
-                val newArtist = Artist(i.toString(), setOf<String>(), 0L, "https://example.com", 1, listOf<Image>())
+                val newArtist = Artist(i.toString(), setOf<String>(), 0L, "https://example.com", 1)
                 artists[i + 1] = newArtist
                 artistGraph.addVertex(newArtist)
             }
@@ -83,13 +83,28 @@ class StartApplication : Application() {
                     0L,
                     "https://example.com",
                     1,
-                    listOf<Image>()
                 )
                 )
             }
 
             println("created graph")
             println(artistGraph)
+        }
+
+        private fun loadHexagonGraph() {
+            val artists: MutableList<Artist> = mutableListOf<Artist>()
+            for (i in 0..5) {
+                artists.add(Artist(i.toString(), setOf(), i.toLong(), "https://example.com", i))
+            }
+            for (a in artists) {
+                artistGraph.addVertex(a)
+            }
+            artistGraph.addEdge(artists[0], artists[1], 1)
+            artistGraph.addEdge(artists[1], artists[2], 1)
+            artistGraph.addEdge(artists[2], artists[3], 1)
+            artistGraph.addEdge(artists[3], artists[4], 1)
+            artistGraph.addEdge(artists[4], artists[5], 1)
+            artistGraph.addEdge(artists[5], artists[0], 1)
         }
     }
 }

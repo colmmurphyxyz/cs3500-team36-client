@@ -1,7 +1,9 @@
 package xyz.colmmurphy.klaassify.api
 import io.socket.client.IO
 import io.socket.client.Socket
+import kotlinx.serialization.json.Json
 import xyz.colmmurphy.klaassify.api.socket.SocketEventListeners
+import xyz.colmmurphy.klaassify.collections.Artist
 
 class SocketAPI(uri:String) {
     //Event listeners could definetly be spread to different class but
@@ -19,6 +21,12 @@ class SocketAPI(uri:String) {
         socket.on("connection_request_ACK") { args ->
             println("Connection Acknowledgement from server. Server response: ${args[0]}")
 
+        }
+
+        socket.on("top_artists_response") { data ->
+            val o = Array<Artist>(20) {
+                Json.decodeFromString<Artist>(data[it] as String)
+            }
         }
 
         socket.on(Socket.EVENT_DISCONNECT) {

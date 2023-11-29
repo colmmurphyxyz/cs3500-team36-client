@@ -3,13 +3,31 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Label?>
+<?import com.sun.javafx.webkit.theme.RenderThemeImpl.FormTextField?>
+<?import javafx.scene.layout.HBox?>
 <VBox alignment="center" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="xyz.colmmurphy.klaassify.controllers.GraphViewController">
     <Text fx:id="title">Graph of your music taste</Text>
     <Text fx:id="subtitle">We sampled {N} different artists, spanning {K} distinct genres,
         with {M} genre connections between these artists</Text>
+    <Button fx:id="resetButton" onAction="#onResetButtonClick" text="Reset" />
+    <HBox alignment="CENTER" spacing="10">
+        <Label fx:id="idealEdgeLengthLabel" text="Ideal Edge Length"/>
+        <TextField fx:id="idealEdgeLengthField" text="40.0" maxWidth="80"/>
+        <Label text="Cooling Factor" />
+        <TextField fx:id="coolingFactorField" />
+    </HBox>
+    <HBox alignment="CENTER" spacing="10">
+        <Label text="Repulsion Constant" />
+        <TextField fx:id="repulsionConstantField"/>
+        <Label text="Attraction Constant" />
+        <TextField fx:id="attractionConstantField" />
+    </HBox>
     <VBox maxWidth="800" maxHeight="800" style="-fx-border-color: red; -fx-border-width: 10; -fx-border-style: solid;">
-        <Canvas fx:id="canvas" width="800" height="800">
+        <Canvas fx:id="canvas" width="800" height="700">
         </Canvas>
     </VBox>
 </VBox>

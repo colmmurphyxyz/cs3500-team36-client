@@ -2,13 +2,14 @@ package xyz.colmmurphy.klaassify.controllers
 
 import javafx.fxml.FXML
 import javafx.scene.canvas.Canvas
+import javafx.scene.control.Button
+import javafx.scene.control.Label
+import javafx.scene.control.TextField
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
-import xyz.colmmurphy.klaassify.Client
 import xyz.colmmurphy.klaassify.StartApplication
 import xyz.colmmurphy.klaassify.collections.Artist
-import java.lang.Math.pow
-import java.lang.System.gc
+import java.util.*
 import kotlin.concurrent.fixedRateTimer
 import kotlin.math.*
 import kotlin.random.Random
@@ -21,18 +22,36 @@ class GraphViewController {
     lateinit var subtitle: Text
     @FXML
     lateinit var canvas: Canvas
+    @FXML
+    lateinit var resetButton: Button
+    @FXML
+    lateinit var idealEdgeLengthLabel: Label
+    @FXML
+    lateinit var idealEdgeLengthField: TextField
+    @FXML
+    lateinit var repulsionConstantField: TextField
+    @FXML
+    lateinit var attractionConstantField: TextField
+    @FXML
+    lateinit var coolingFactorField: TextField
 
     private val graph = StartApplication.artistGraph
 
     object eadesSpringEmbedder {
         private val graph = StartApplication.artistGraph
-        private const val idealLength = 50.0
-        private const val cRep = 2.0
-        private const val cAttr = 1.0
-        private const val epsilon = 10.0
-        private const val coolingFactor = 0.99
+        var canvasWidth = 800.0
+        var canvasHeight = 800.0
+
+        var idealLength = 50.0
+        var cRep = 2.0
+        var cAttr = 1.0
+        var epsilon = 0.1
+        var coolingFactor = 0.99
         private var delta = 1.0
         var iterationsDone = 0
+
+        var timer: Timer? = null
+
         var positions: MutableMap<Artist, DoubleArray> = mutableMapOf(
             *graph.vertices.map {
                 it to (doubleArrayOf(0.0, 0.0))
@@ -62,6 +81,16 @@ class GraphViewController {
                     it to doubleArrayOf(0.0, 0.0)
                 }.toTypedArray()
             )
+            timer?.cancel()
+        }
+
+        fun getMaxForce(): Double {
+            var maxForce = 0.0
+            for (i in forces.values) {
+                if (abs(i[0]) > abs(maxForce)) maxForce = i[0]
+                if (abs(i[1]) > abs(maxForce)) maxForce = i[1]
+            }
+            return maxForce
         }
 
         fun fattr(u: Artist, v: Artist): DoubleArray {
@@ -124,31 +153,12 @@ class GraphViewController {
             // update delta
             delta *= coolingFactor
             iterationsDone += 1
-            // find max force, print it
-            var maxForce = 0.0
-            for (i in forces.values) {
-                if (abs(i[0]) > abs(maxForce)) maxForce = i[0]
-                if (abs(i[1]) > abs(maxForce)) maxForce = i[1]
-            }
-            println("strongest force: $maxForce")
         }
     }
 
     private fun drawGraph(p: MutableMap<Artist, DoubleArray>) {
         val drawCoords = mutableMapOf<Artist, DoubleArray>()
         // scale coords
-//        var maxDistFromCenter = 0.0
-//        for (i in p.values) {
-//            val dist = sqrt((i[0] - 400).pow(2) + (i[1] - 400).pow(2) )
-//            if (dist > maxDistFromCenter) maxDistFromCenter = dist
-//        }
-//        println("max distance from center: $maxDistFromCenter")
-//        val scaleFactor = 375.0 / maxDistFromCenter
-//        for (i in p.values) {
-//            // scale all coords such that the furthest node from the center is now 350.0 units from the center
-//            i[0] = ((i[0] - 400) * scaleFactor) + 400
-//            i[1] = ((i[1] - 400) * scaleFactor) + 400
-//        }
 
         // translate all coordinates such that the smallest x coordinate is 50 and the smallest y coordinate is 50
         var minX = Double.MAX_VALUE
@@ -168,8 +178,8 @@ class GraphViewController {
             maxX = max(maxX, i[0])
             maxY = max(maxY, i[1])
         }
-        val scaleX = 750.0 / maxX
-        val scaleY = 750.0 / maxY
+        val scaleX = (canvas.width - 50.0) / maxX
+        val scaleY = (canvas.height - 50.0) / maxY
         drawCoords.forEach { (artist, coords) ->
             drawCoords[artist]!![0] *= scaleX
             drawCoords[artist]!![1] *= scaleY
@@ -186,169 +196,65 @@ class GraphViewController {
             val pv = drawCoords[e.v2 as Artist]!!
             gc.strokeLine(pu[0], pu[1], pv[0], pv[1])
         }
-//        for (e in graph.edges) {
-//            val pu = p[e.v1]!!
-//            val pv = p[e.v2]!!
-//            gc.strokeLine(pu[0], pu[1], pv[0], pv[1])
-//        }
         // draw vertices
         gc.fill = Color.BLUEVIOLET
         for (node in drawCoords.keys) {
             val d = drawCoords[node]!!
             gc.fillOval(d[0] - 10.0, d[1] - 10.0, 20.0, 20.0)
         }
-//        for (i in graph.vertices) {
-//            val pos: DoubleArray = p[i]!!
-//            gc.fillOval(pos[0] - 10.0, pos[1] - 10.0, 20.0, 20.0)
-////            gc.fillText(i.name, pos[0] - 30, pos[1] + 30)
-//        }
         gc.stroke()
     }
 
-    private fun renderGraph() {
+    private fun renderGraph(): Timer {
         eadesSpringEmbedder.reset()
-        val k = 5_000
-        val frt = fixedRateTimer("graph render", period = 20L) {
+        val k = 2000
+        return fixedRateTimer("graph render", period = 40L) {
             if (eadesSpringEmbedder.iterationsDone < k) {
                 eadesSpringEmbedder.doOneIteration()
                 drawGraph(eadesSpringEmbedder.positions)
             } else {
                 this.cancel()
             }
+            if (abs(eadesSpringEmbedder.getMaxForce()) < eadesSpringEmbedder.epsilon) {
+                this.cancel()
+            }
         }
+    }
+//    private val isDouble(tf: TextField): Boolean = tf.text.matches(Regex("""^\d+(\.\d+)?$"""))
+    private val isDouble: (TextField) -> Boolean =  { it.text.matches(Regex("""^\d+(\.\d+)?$""")) }
+    private fun validate(tf: TextField, predicate: (TextField) -> Boolean): Boolean {
+        if (predicate(tf)) {
+            return true
+        }
+        tf.text = "Must be a positive number"
+        return false
+    }
+
+    fun onResetButtonClick() {
+        println("resetting")
+        if (validate(idealEdgeLengthField, isDouble)) eadesSpringEmbedder.idealLength = idealEdgeLengthField.text.toDouble()
+        if (validate(repulsionConstantField, isDouble)) eadesSpringEmbedder.cRep = repulsionConstantField.text.toDouble()
+        if (validate(attractionConstantField, isDouble)) eadesSpringEmbedder.cAttr = attractionConstantField.text.toDouble()
+        if (validate(coolingFactorField, isDouble)) {
+            val cf = coolingFactorField.text.toDouble()
+            if (cf >= 1.0 || cf <= 0.0) {
+                coolingFactorField.text = "Must be a number between 0 and 1"
+            } else {
+                eadesSpringEmbedder.coolingFactor = coolingFactorField.text.toDouble()
+            }
+        }
+
+        eadesSpringEmbedder.reset()
+        eadesSpringEmbedder.timer = renderGraph()
     }
 
     fun initialize() {
+        eadesSpringEmbedder.canvasWidth = canvas.width
+        eadesSpringEmbedder.canvasHeight = canvas.height
+        idealEdgeLengthField.text = eadesSpringEmbedder.idealLength.toString()
+        repulsionConstantField.text = eadesSpringEmbedder.cRep.toString()
+        attractionConstantField.text = eadesSpringEmbedder.cAttr.toString()
+        coolingFactorField.text = eadesSpringEmbedder.coolingFactor.toString()
         renderGraph()
-//        val positions = eadesSpringEmbedder_old()
-//        // scaling
-//        var maxValue = 1.0
-//        for (i in positions.values) {
-//            if (i[0] > maxValue) maxValue = i[0]
-//            if (i[1] > maxValue) maxValue = i[1]
-//        }
-//        val scalingFactor = canvas.width / maxValue
-//        for (i in positions.values) {
-//            i[0] *= scalingFactor
-//            i[1] *= scalingFactor
-//        }
-//        // draw graph
-//        val gc = canvas.graphicsContext2D
-//        gc.clearRect(0.0, 0.0, canvas.width, canvas.height)
-//        // draw edges first
-//        gc.stroke = Color.BLACK
-//        for (i in graph.vertices) {
-//            for (e in graph.getEdges(i)) {
-//                val j = e.opposite(i)
-//                val posI = positions[i]!!
-//                val posJ = positions[j]!!
-//                gc.strokeLine(posI[0], posI[1], posJ[0], posJ[1])
-//            }
-//        }
-//        // Draw vertices
-//        gc.fill = Color.CADETBLUE
-//        for (i in graph.vertices) {
-//            val pos: DoubleArray = positions[i]!!
-//            gc.fillOval(pos[0] - 10.0, pos[1] - 10.0, 20.0, 20.0)
-//            gc.fillText(i.name, pos[0] - 30, pos[1] + 30)
-//        }
-//        gc.stroke()
-    }
-
-    /**
-     * Function to Render a graph
-     * @return hashmap containing vertices as keys, and their coordinates as double arrays
-     */
-    private fun eadesSpringEmbedder_old(): HashMap<Artist, DoubleArray> {
-        // constants
-        val coolingFactor = 0.975
-        val l = 40.0
-        val cRep = 8.0
-        val cAttr = 8.0
-        val k = 10_000
-        val epsilon = 1.0
-
-        val random = Random(System.currentTimeMillis())
-        val p = hashMapOf(*graph.vertices.map {
-            it to (doubleArrayOf(random.nextDouble() * canvas.width, random.nextDouble() * canvas.height))
-        }.toTypedArray())
-        val forces = hashMapOf(*graph.vertices.map { it to doubleArrayOf(0.0, 0.0) }.toTypedArray())
-
-        fun frep(u: Artist, v: Artist): DoubleArray {
-            if (u == v) return doubleArrayOf(0.0, 0.0)
-            val pu = p[u]!!
-            val pv = p[v]!!
-            val dx = pu[0] - pv[0]
-            val dy = pu[1] - pv[1]
-            return doubleArrayOf(cRep / (dx * dx), cRep / (dy * dy))
-        }
-        fun centerForce(u: Artist): DoubleArray {
-            val dx = abs(p[u]!![0] - canvas.width / 2)
-            val dy = abs(p[u]!![1] - canvas.width / 2)
-            return doubleArrayOf(2000 / (dx * dx), 2000 / (dy * dy))
-        }
-        fun fattr(u: Artist, v: Artist): DoubleArray {
-            if (u == v) return doubleArrayOf(0.0, 0.0)
-            val pu = p[u]!!
-            val pv = p[v]!!
-            val dx = abs(pu[0] - pv[0])
-            val dy = abs(pu[1] - pv[1])
-            val fx = cAttr * ln(dx / l)
-            val fy = cAttr * ln(dy / l)
-            val fr = frep(u, v)
-            return doubleArrayOf(fx - fr[0], fy - fr[1])
-        }
-
-        var prevMaxForce = 0.0
-        var delta = 1.0
-        var t = 0
-        while (t < k) {
-            // update forces
-            for (u in graph.vertices) {
-                val sumForcesRep = doubleArrayOf(0.0, 0.0)
-                for (v in graph.vertices) {
-                    val f = frep(u, v)
-                    sumForcesRep[0] += f[0]
-                    sumForcesRep[1] += f[1]
-                }
-                val sumForcesAttr = doubleArrayOf(0.0, 0.0)
-                for (e in graph.getEdges(u)) {
-                    val v = e.opposite(u)!! as Artist
-                    // no attractive force between non-adjacent vertices
-                    if (!graph.areAdjacent(u, v)) continue
-                    val f = fattr(u, v)
-                    sumForcesAttr[0] += f[0]
-                    sumForcesAttr[1] += f[1]
-                }
-                val fCenter = centerForce(u)
-                forces[u] = doubleArrayOf(
-                    sumForcesRep[0] + sumForcesAttr[0] + fCenter[0],
-                    sumForcesRep[1] + sumForcesAttr[1] + fCenter[1]
-                )
-            }
-            // update positions
-            for (u in graph.vertices) {
-                p[u]!![0] = p[u]!![0] + (delta * forces[u]!![0])
-                p[u]!![1] = p[u]!![1] + (delta * forces[u]!![1])
-            }
-            // update cooling factor
-            delta *= coolingFactor
-            t++
-            // if max recorded force < epsilon, finish simulating
-            var maxForce = 0.0
-            forces.values.forEach {
-                if (it[0] > maxForce) maxForce = it[0]
-                if (it[1] > maxForce) maxForce = it[1]
-            }
-            println(maxForce)
-            if (maxForce < epsilon) {
-                return p
-            }
-            if (maxForce == prevMaxForce) {
-                return p
-            }
-            prevMaxForce = maxForce
-        }
-        return p
     }
 }

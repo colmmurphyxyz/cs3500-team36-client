@@ -65,8 +65,7 @@ class Client : Application() {
                     genres,
                     0L,
                     "https://example.com",
-                    1,
-                    listOf<Image>()
+                    1
                 ))
             }
             println("created graph")
