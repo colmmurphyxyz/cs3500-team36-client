@@ -43,8 +43,7 @@ import io.socket.client.Socket
             eventListeners[eventName] = listener
         }
 
-        fun disconnect() {
+        fun disconnectFromServer() {
             socket.emit("disconnect")
-            socket.disconnect()
         }
     }

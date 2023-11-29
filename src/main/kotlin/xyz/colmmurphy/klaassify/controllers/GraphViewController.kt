@@ -1,13 +1,18 @@
 package xyz.colmmurphy.klaassify.controllers
 
 import javafx.fxml.FXML
+import javafx.fxml.FXMLLoader
+import javafx.scene.Parent
+import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
+import javafx.stage.Stage
 import xyz.colmmurphy.klaassify.StartApplication
+import xyz.colmmurphy.klaassify.api.socket.SocketAPI
 import xyz.colmmurphy.klaassify.collections.Artist
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
@@ -25,6 +30,12 @@ class GraphViewController {
     @FXML
     lateinit var resetButton: Button
     @FXML
+    lateinit var benDataButton: Button
+    @FXML
+    lateinit var logOutButton: Button
+    @FXML
+    lateinit var colmDataButton: Button
+    @FXML
     lateinit var idealEdgeLengthLabel: Label
     @FXML
     lateinit var idealEdgeLengthField: TextField
@@ -36,7 +47,7 @@ class GraphViewController {
     lateinit var coolingFactorField: TextField
 
     private val graph = StartApplication.artistGraph
-
+    private val userID = "myid"
     object eadesSpringEmbedder {
         private val graph = StartApplication.artistGraph
         var canvasWidth = 800.0
@@ -197,7 +208,7 @@ class GraphViewController {
             gc.strokeLine(pu[0], pu[1], pv[0], pv[1])
         }
         // draw vertices
-        gc.fill = Color.BLUEVIOLET
+        gc.fill = Color.GREENYELLOW
         for (node in drawCoords.keys) {
             val d = drawCoords[node]!!
             gc.fillOval(d[0] - 10.0, d[1] - 10.0, 20.0, 20.0)
@@ -247,7 +258,18 @@ class GraphViewController {
         eadesSpringEmbedder.reset()
         eadesSpringEmbedder.timer = renderGraph()
     }
+    fun logOut(){
+        println("Logout")
+        val socket : SocketAPI = SocketAPI("http://localhost:3000")
+        socket.connect()
+        socket.logout(userID)
+        val root: Parent = FXMLLoader.load<Parent>(
+            this::class.java.classLoader.getResource("view/main-view.fxml")
+        )
 
+        val window: Stage = logOutButton.scene.window as Stage
+        window.scene = Scene(root, 1000.0, 1000.0)
+    }
     fun initialize() {
         eadesSpringEmbedder.canvasWidth = canvas.width
         eadesSpringEmbedder.canvasHeight = canvas.height

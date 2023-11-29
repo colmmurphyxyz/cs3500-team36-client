@@ -16,6 +16,7 @@ import xyz.colmmurphy.klaassify.collections.Artist
 import xyz.colmmurphy.klaassify.collections.ArtistJsonEntry
 import java.awt.Desktop
 import java.net.URI
+import kotlin.random.Random
 
 /**
  * Controller for the main view, or the landing page to the application
@@ -23,8 +24,7 @@ import java.net.URI
 class Controller {
     @FXML
     lateinit var loginButton: Button
-    @FXML
-    lateinit var logoutButton: Button
+
     @FXML
     lateinit var title: Text
     @FXML
@@ -32,13 +32,18 @@ class Controller {
     @FXML
     lateinit var redirectButton: Button
 
+    fun generateRandomString(length: Int): String {
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        return (1..length)
+            .map { chars[Random.nextInt(chars.length)] }
+            .joinToString("")
+    }
     val socket : SocketAPI = SocketAPI("http://localhost:3000")
     var loginLink : String = ""
-    var userID : String = "myid"
+    var userID : String = generateRandomString(16)
     fun initialize() {
 
         loginButton.isVisible=false
-        logoutButton.isVisible=false
         socket.connect()
         socket.requestBenOrColmData("ben")
         println("requesting token")
@@ -52,7 +57,6 @@ class Controller {
             responseText.text = "Authorization complete, redirecting..."
             redirectButton.isVisible = true
             socket.requestTopArtist(userID)
-            logoutButton.isVisible=true
         }
 
         socket.onEvent("login_link") { eventData ->
@@ -104,15 +108,13 @@ class Controller {
 
         val window: Stage = loginButton.scene.window as Stage
         window.scene = Scene(root, 1000.0, 1000.0)
+
     }
 
     fun onLoginButtonClick() {
         openBrowser(loginLink)
     }
-    fun onLogoutButtonClick() {
-        socket.logout(userID)
-        //REDIRECT TO THIS VIEW ? AND RELOAD CONTROLLER? IDK WHAT BEST PRACTISE IS
-    }
+
     private fun openBrowser(url: String){
         val os = System.getProperty("os.name").lowercase()
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
