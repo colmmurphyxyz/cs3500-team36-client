@@ -23,6 +23,6 @@
     <Button fx:id="loginButton" text="Login" onAction="#onLoginButtonClick" styleClass="login-button" prefWidth="200" prefHeight="40"/>
     <Text fx:id="responseText" style="-fx-fill: white; -fx-font-size:15px;"> </Text>
     <Button fx:id="logoutButton" text="Logout" onAction="#onLogoutButtonClick" styleClass="login-button" prefWidth="200" prefHeight="40"/>
-
+    <Button fx:id="redirectButton" text="Click me i guess" onAction="#onRedirectButtonClick" prefWidth="200" prefHeight="40" visible="false"/>
 
 </VBox>

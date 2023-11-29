@@ -120,7 +120,7 @@ class GraphViewController {
 
 
         fun doOneIteration() {
-            println("on iteration $iterationsDone")
+//            println("on iteration $iterationsDone")
             // update forces
             for (u in graph.vertices) {
                 val sumForcesRep = doubleArrayOf(0.0, 0.0)

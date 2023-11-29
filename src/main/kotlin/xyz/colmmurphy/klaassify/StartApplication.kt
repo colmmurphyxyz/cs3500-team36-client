@@ -7,6 +7,10 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import xyz.colmmurphy.klaassify.collections.Artist
 import xyz.colmmurphy.klaassify.collections.ArtistGraph
 import xyz.colmmurphy.klaassify.collections.commonGenre
@@ -15,7 +19,7 @@ import java.io.File
 class StartApplication : Application() {
 
     override fun start(primaryStage: Stage) {
-        loadDummyGraphData(15)
+//        loadDummyGraphData(15)
 
         primaryStage.title = "CS3500 Team 36 client"
         val root = FXMLLoader.load<Parent>(Client::class.java.classLoader.getResource("view/main-view.fxml"))

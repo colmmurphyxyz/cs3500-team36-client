@@ -7,7 +7,13 @@ import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.text.Text
 import javafx.stage.Stage
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArrayBuilder
+import xyz.colmmurphy.klaassify.StartApplication
 import xyz.colmmurphy.klaassify.api.socket.SocketAPI
+import xyz.colmmurphy.klaassify.collections.Artist
+import xyz.colmmurphy.klaassify.collections.ArtistJsonEntry
 import java.awt.Desktop
 import java.net.URI
 
@@ -23,6 +29,8 @@ class Controller {
     lateinit var title: Text
     @FXML
     lateinit var responseText: Text
+    @FXML
+    lateinit var redirectButton: Button
 
     val socket : SocketAPI = SocketAPI("http://localhost:3000")
     var loginLink : String = ""
@@ -42,7 +50,7 @@ class Controller {
             loginButton.isVisible=false
             responseText.isVisible=true
             responseText.text = "Authorization complete, redirecting..."
-            //move view to graph
+            redirectButton.isVisible = true
             socket.requestTopArtist(userID)
             logoutButton.isVisible=true
         }
@@ -55,10 +63,47 @@ class Controller {
 
         socket.onEvent("top_artists_response"){ eventData ->
             println("Top artists: $eventData")
+            val jsonString = eventData.substringAfter("\"items\":").substringBeforeLast('}')
+            val artists = Json.decodeFromString<List<ArtistJsonEntry>>(jsonString)
+            artists.forEach {
+                val a = it.toArtist()
+                StartApplication.artistGraph.addVertexAndCreateEdges(a)
+            }
+            for (a in StartApplication.artistGraph.vertices) {
+                println("degree=${StartApplication.artistGraph.degree(a)}")
+                if (StartApplication.artistGraph.degree(a) == 0) {
+                    StartApplication.artistGraph.removeVertex(a)
+                }
+            }
+            for (a in StartApplication.artistGraph.vertices) {
+                var noConnections = true
+                for (b in StartApplication.artistGraph.vertices) {
+                    if (a == b) continue
+                    if ((a.genres intersect b.genres).isNotEmpty()) {
+                        noConnections = false
+                    }
+                }
+                if (noConnections) {
+                    println("removing ${a.name}")
+                    StartApplication.artistGraph.removeVertex(a)
+                }
+            }
+            redirectButton.isVisible = true
         }
+
         socket.onEvent("response_ben_or_colm_data"){ eventData ->
             println("BenOrColmData Data: $eventData")
         }
+    }
+
+    fun onRedirectButtonClick() {
+        println("redirecting")
+        val root: Parent = FXMLLoader.load<Parent>(
+            this::class.java.classLoader.getResource("view/graph-view.fxml")
+        )
+
+        val window: Stage = loginButton.scene.window as Stage
+        window.scene = Scene(root, 1000.0, 1000.0)
     }
 
     fun onLoginButtonClick() {

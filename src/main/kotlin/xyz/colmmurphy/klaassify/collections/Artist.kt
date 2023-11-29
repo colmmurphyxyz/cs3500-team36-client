@@ -12,7 +12,7 @@ data class Artist(
     val name: String,
     val genres: Set<String>,
     val followers: Long,
-    val spotifyUrl: String,
+    val url: String,
     val popularity: Int,
 ) : Vertex() {
     override val element: Artist

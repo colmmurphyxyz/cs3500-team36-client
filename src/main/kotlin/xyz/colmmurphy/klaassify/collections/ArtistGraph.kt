@@ -41,9 +41,14 @@ class ArtistGraph(
      */
     override val edges: List<Edge<Int>>
         get() {
-            val e = mutableSetOf<Edge<Int>>()
+            val e = mutableListOf<Edge<Int>>()
             for (v in adjacencyList.keys) {
-                e.addAll(getEdges(v))
+                for (edge in getEdges(v)) {
+                    if (edge !in e) {
+                        e.add(edge)
+                    }
+                }
+//                e.addAll(getEdges(v))
             }
             return e.toList()
         }
@@ -83,7 +88,7 @@ class ArtistGraph(
      * @return Number of edges incident on v
      */
     override fun degree(v: Artist): Int {
-        return getEdges(v).size
+        return adjacencyList[v]!!.size
     }
 
     /**
@@ -133,8 +138,9 @@ class ArtistGraph(
         for (edge in adjacencyList[v]!!) {
             adjacencyList[edge.opposite(v)]!!.remove(edge)
         }
+        println("before remove: ${adjacencyList.keys.size}")
         adjacencyList.remove(v)
-        adjacencyList.keys.removeAll { it -> degree(it) == 0 }
+        println("after remove: ${adjacencyList.keys.size}")
     }
 
     /**
