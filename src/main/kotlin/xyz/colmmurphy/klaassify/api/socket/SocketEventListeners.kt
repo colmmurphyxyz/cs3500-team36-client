@@ -20,6 +20,10 @@ class SocketEventListeners(private val socket: Socket) {
         val message = args[0].toString()
         notifyEventListener("top_artists_response", message)
     }
+    private val onBenColmDataResponse = Emitter.Listener { args ->
+        val message = args[0].toString()
+        notifyEventListener("response_ben_or_colm_data", message)
+    }
     private fun notifyEventListener(eventName: String, message: String) {
         eventListeners[eventName]?.invoke(message)
     }
@@ -33,5 +37,7 @@ class SocketEventListeners(private val socket: Socket) {
         socket.on("authorized", onAuthorizedEvent)
         socket.on("login_link", onLoginLink)
         socket.on("top_artists_response", onTopArtistsResponse)
+        socket.on("response_ben_or_colm_data", onBenColmDataResponse)
+
     }
 }
