@@ -45,7 +45,6 @@ class Controller {
 
         loginButton.isVisible=false
         socket.connect()
-        socket.requestBenOrColmData("ben")
         println("requesting token")
         socket.requestAuthToken(userID)
         responseText.text = "Error receiving response from server (is server on?)"

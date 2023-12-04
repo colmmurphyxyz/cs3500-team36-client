@@ -15,14 +15,6 @@
         <Button fx:id="logOutButton" text="Logout" onAction="#logOut" style="-fx-fill: white; -fx-font-size:15px;" />
     </HBox>
     <Text fx:id="title" style="-fx-fill: white; -fx-font-size:20px;">Graph of your music taste </Text>
-    <Text fx:id="subtitle" style="-fx-fill: white; -fx-font-size:15px;">We sampled {N} different artists, spanning {K} distinct genres,
-        with {M} genre connections between these artists</Text>
-    <HBox alignment="CENTER" spacing="10">
-        <Button fx:id="benDataButton" onAction="#onResetButtonClick" text="Ben's listening data" />
-        <Button fx:id="colmDataButton" onAction="#onResetButtonClick" text="Colm's Listening data" />
-    </HBox>
-
-
     <Button fx:id="resetButton" onAction="#onResetButtonClick" text="Reset" />
     <HBox alignment="CENTER" spacing="10" style="-fx-background-color: white; " maxWidth="700">
         <Label fx:id="idealEdgeLengthLabel" style="-fx-fill: black; -fx-font-size:15px;" text="Ideal Edge Length" />
