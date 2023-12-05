@@ -9,8 +9,10 @@ class Edge<T>(
 
     override fun equals(other: Any?): Boolean {
         return if (other is Edge<*>) {
-            (v1 == other.v1 && v2 == other.v2)
+            (
+                    (v1 == other.v1 && v2 == other.v2)
                     || (v1 == other.v2 && v2 == other.v1)
+            )
                     && element == other.element
         } else {
             super.equals(other)
@@ -24,7 +26,7 @@ class Edge<T>(
         return result
     }
 
-    private val vertices: Pair<Vertex, Vertex>
+    val vertices: Pair<Vertex, Vertex>
         get() = v1 to v2
 
     fun opposite(v: Vertex): Vertex? {

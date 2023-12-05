@@ -96,6 +96,7 @@ class ArtistGraph(
      * @param vertex artist from which to create the vertex
      */
     override fun addVertex(vertex: Artist) {
+        if (vertex in adjacencyList.keys) return
         adjacencyList[vertex] = mutableListOf<Edge<Int>>()
     }
 
