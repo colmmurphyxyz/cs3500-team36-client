@@ -38,9 +38,9 @@ class Controller {
             .map { chars[Random.nextInt(chars.length)] }
             .joinToString("")
     }
-    val socket : SocketAPI = SocketAPI("http://localhost:3000")
-    var loginLink : String = ""
-    var userID : String = generateRandomString(16)
+    private val socket : SocketAPI = SocketAPI("http://localhost:3000")
+    private var loginLink : String = ""
+    private var userID : String = generateRandomString(16)
     fun initialize() {
 
         loginButton.isVisible=false
@@ -53,7 +53,7 @@ class Controller {
             println("Handshake complete")
             loginButton.isVisible=false
             responseText.isVisible=true
-            responseText.text = "Authorization complete, redirecting..."
+            responseText.text = "Authorization complete, please click the redirect button to continue"
             redirectButton.isVisible = true
             socket.requestTopArtist(userID)
         }
@@ -73,7 +73,6 @@ class Controller {
                 StartApplication.artistGraph.addVertexAndCreateEdges(a)
             }
             for (a in StartApplication.artistGraph.vertices) {
-                println("degree=${StartApplication.artistGraph.degree(a)}")
                 if (StartApplication.artistGraph.degree(a) == 0) {
                     StartApplication.artistGraph.removeVertex(a)
                 }
@@ -106,8 +105,6 @@ class Controller {
         )
 
         val window: Stage = loginButton.scene.window as Stage
-        window.scene = Scene(root, 1000.0, 1000.0)
-
         window.scene = Scene(root, 1400.0, 1000.0)
     }
 
@@ -121,16 +118,21 @@ class Controller {
             try {
                 //IF linux based system (ick)
                 if (os.contains("nix") || os.contains("nux") || os.contains("aix")){
+                    print("lin")
                     val processBuilder = ProcessBuilder("xdg-open", url)
                     val process = processBuilder.start()
+                    print("ux")
                     val exitCode = process.waitFor()
-                    if(exitCode !=0){
+                    if (exitCode !=0) {
                         print("Error Opening url")
-                        }
                     }
-                val uri = URI(url)
-                Desktop.getDesktop().browse(uri)
-
+                    println("rocks")
+                } else {
+                    val uri = URI(url)
+                    print("foo")
+                    Desktop.getDesktop().browse(uri)
+                    println("bar")
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

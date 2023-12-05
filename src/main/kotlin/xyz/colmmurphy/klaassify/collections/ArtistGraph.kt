@@ -143,9 +143,7 @@ class ArtistGraph(
         for (edge in adjacencyList[v]!!) {
             adjacencyList[edge.opposite(v)]!!.remove(edge)
         }
-        println("before remove: ${adjacencyList.keys.size}")
         adjacencyList.remove(v)
-        println("after remove: ${adjacencyList.keys.size}")
     }
 
     /**

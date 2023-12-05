@@ -17,7 +17,6 @@ import io.socket.client.Socket
             }
             socket.on("connection_request_ACK") { args ->
                 println("Connection Acknowledgement from server. Server response: ${args[0]}")
-
             }
 
             socket.on(Socket.EVENT_DISCONNECT) {
