@@ -12,7 +12,7 @@
       fx:controller="xyz.colmmurphy.klaassify.controllers.GraphViewController"       style="-fx-background-color: linear-gradient(from 0% 0% to 0% 150%, #181117, #949494);"
     >
     <HBox alignment="TOP_RIGHT" spacing="10">
-        <Button fx:id="logOutButton" text="Logout" style="-fx-fill: white; -fx-font-size:15px;" />
+        <Button fx:id="logOutButton" onAction="#logOut" text="Logout" style="-fx-fill: white; -fx-font-size:15px;" />
     </HBox>
     <Text fx:id="title" style="-fx-fill: white; -fx-font-size:20px;">Graph of your music taste </Text>
     <Button fx:id="resetButton" onAction="#onResetButtonClick" text="Reset" />
