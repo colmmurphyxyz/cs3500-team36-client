@@ -22,7 +22,7 @@ class StartApplication : Application() {
         loadDummyGraphData(15)
 
         primaryStage.title = "CS3500 Team 36 client"
-        val root = FXMLLoader.load<Parent>(Client::class.java.classLoader.getResource("view/main-view.fxml"))
+        val root = FXMLLoader.load<Parent>(Client::class.java.classLoader.getResource("view/graph-view.fxml"))
         primaryStage.scene = Scene(root, 1400.0, 1000.0)
         primaryStage.show()
     }

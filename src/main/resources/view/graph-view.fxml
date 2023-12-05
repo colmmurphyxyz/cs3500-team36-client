@@ -30,8 +30,26 @@
         <TextField fx:id="attractionConstantField"/>
     </HBox>
 
-    <VBox maxWidth="800" maxHeight="400" style="-fx-border-color: white; -fx-border-width: 10; -fx-border-style: solid;">
-        <Canvas fx:id="canvas" width="800" height="400">
+    <HBox style="-fx-border-color: white; -fx-border-width: 10; -fx-border-style: solid;">
+        <Canvas fx:id="canvas" width="800" height="700">
         </Canvas>
-    </VBox>
+        <VBox style="-fx-background-color: white; -fx-border-color: white; -fx-border-width: 8; -fx-border-style: solid;">
+            <HBox alignment="CENTER" spacing="10">
+                <Label text="Number of iterations done" />
+                <Text fx:id="numberIterationsField"/>
+            </HBox>
+            <HBox alignment="CENTER" spacing="10">
+                <Label text="Selected Artist" />
+                <Text fx:id="selectedArtistField" />
+            </HBox>
+            <HBox alignment="CENTER" spacing="10">
+                <Label text="Selected Artist Degree" />
+                <Text fx:id="selectedArtistDegreeField" />
+            </HBox>
+            <HBox alignment="CENTER" spacing="10">
+                <Label text="Related Artists" />
+                <Text fx:id="relatedArtistsField" />
+            </HBox>
+        </VBox>
+    </HBox>
 </VBox>
