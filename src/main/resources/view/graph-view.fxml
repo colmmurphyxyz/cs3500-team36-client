@@ -8,44 +8,30 @@
 <?import javafx.scene.control.Label?>
 <?import com.sun.javafx.webkit.theme.RenderThemeImpl.FormTextField?>
 <?import javafx.scene.layout.HBox?>
-<VBox alignment="center" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="xyz.colmmurphy.klaassify.controllers.GraphViewController">
-    <Text fx:id="title">Graph of your music taste</Text>
-    <Text fx:id="subtitle">We sampled {N} different artists, spanning {K} distinct genres,
-        with {M} genre connections between these artists</Text>
+<VBox alignment="center" spacing="10.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="xyz.colmmurphy.klaassify.controllers.GraphViewController"       style="-fx-background-color: linear-gradient(from 0% 0% to 0% 150%, #181117, #949494);"
+    >
+    <HBox alignment="TOP_RIGHT" spacing="10">
+        <Button fx:id="logOutButton" text="Logout" style="-fx-fill: white; -fx-font-size:15px;" />
+    </HBox>
+    <Text fx:id="title" style="-fx-fill: white; -fx-font-size:20px;">Graph of your music taste </Text>
     <Button fx:id="resetButton" onAction="#onResetButtonClick" text="Reset" />
-    <HBox alignment="CENTER" spacing="10">
-        <Label fx:id="idealEdgeLengthLabel" text="Ideal Edge Length"/>
-        <TextField fx:id="idealEdgeLengthField" text="40.0" maxWidth="80"/>
-        <Label text="Cooling Factor" />
+    <HBox alignment="CENTER" spacing="10" style="-fx-background-color: white; " maxWidth="700">
+        <Label fx:id="idealEdgeLengthLabel" style="-fx-fill: black; -fx-font-size:15px;" text="Ideal Edge Length" />
+        <TextField fx:id="idealEdgeLengthField" text="40.0" />
+        <Label text="Cooling Factor" style="-fx-fill: black; -fx-font-size:15px;" />
         <TextField fx:id="coolingFactorField" />
     </HBox>
-    <HBox alignment="CENTER" spacing="10">
-        <Label text="Repulsion Constant" />
+
+    <HBox alignment="CENTER" spacing="10" style="-fx-background-color: white;" maxWidth="700">
+        <Label text="Repulsion Constant" style="-fx-fill: black; -fx-font-size:15px;" />
         <TextField fx:id="repulsionConstantField"/>
-        <Label text="Attraction Constant" />
-        <TextField fx:id="attractionConstantField" />
+        <Label text="Attraction Constant" style="-fx-fill: black; -fx-font-size:15px;"/>
+        <TextField fx:id="attractionConstantField"/>
     </HBox>
-    <HBox style="-fx-border-color: red; -fx-border-width: 10; -fx-border-style: solid;">
-        <Canvas fx:id="canvas" width="800" height="700">
+
+    <VBox maxWidth="800" maxHeight="400" style="-fx-border-color: white; -fx-border-width: 10; -fx-border-style: solid;">
+        <Canvas fx:id="canvas" width="800" height="400">
         </Canvas>
-        <VBox style="-fx-border-color: blue; -fx-border-width: 8; -fx-border-style: solid;">
-            <HBox alignment="CENTER" spacing="10">
-                <Label text="Number of iterations done" />
-                <Text fx:id="numberIterationsField"/>
-            </HBox>
-            <HBox alignment="CENTER" spacing="10">
-                <Label text="Selected Artist" />
-                <Text fx:id="selectedArtistField" />
-            </HBox>
-            <HBox alignment="CENTER" spacing="10">
-                <Label text="Selected Artist Degree" />
-                <Text fx:id="selectedArtistDegreeField" />
-            </HBox>
-            <HBox alignment="CENTER" spacing="10">
-                <Label text="Related Artists" />
-                <Text fx:id="relatedArtistsField" />
-            </HBox>
-        </VBox>
-    </HBox>
+    </VBox>
 </VBox>
