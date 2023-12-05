@@ -233,15 +233,20 @@ class GraphViewController {
         eadesSpringEmbedder.reset()
         val k = 2000
         return fixedRateTimer("graph render", period = 60L) {
-            if (eadesSpringEmbedder.iterationsDone < k) {
-                eadesSpringEmbedder.doOneIteration()
-                numberIterationsField.text = (eadesSpringEmbedder.iterationsDone + 1).toString()
-                drawGraph(eadesSpringEmbedder.positions)
-            } else {
+            try {
+                if (eadesSpringEmbedder.iterationsDone < k) {
+                    eadesSpringEmbedder.doOneIteration()
+                    numberIterationsField.text = (eadesSpringEmbedder.iterationsDone + 1).toString()
+                    drawGraph(eadesSpringEmbedder.positions)
+                } else {
+                    this.cancel()
+                }
+                if (abs(eadesSpringEmbedder.getMaxForce()) < eadesSpringEmbedder.epsilon) {
+                    this.cancel()
+                }
+            } catch (e: Exception) {
                 this.cancel()
-            }
-            if (abs(eadesSpringEmbedder.getMaxForce()) < eadesSpringEmbedder.epsilon) {
-                this.cancel()
+                renderGraph()
             }
         }
     }
