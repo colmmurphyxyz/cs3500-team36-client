@@ -124,7 +124,11 @@ class ArtistGraph(
      * @return newly created edge
      */
     override fun addEdge(v1: Artist, v2: Artist, element: Int): Edge<Int> {
+        if (v1 == v2) return Edge(v1, v2, element)
         val newEdge = Edge<Int>(v1, v2, element)
+        if (newEdge in adjacencyList[v1]!!) {
+            return newEdge
+        }
         adjacencyList[v1]!!.add(newEdge)
         adjacencyList[v2]!!.add(newEdge)
         return newEdge

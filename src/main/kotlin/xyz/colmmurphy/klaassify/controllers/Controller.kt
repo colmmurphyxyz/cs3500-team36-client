@@ -103,7 +103,7 @@ class Controller {
         )
 
         val window: Stage = loginButton.scene.window as Stage
-        window.scene = Scene(root, 1000.0, 1000.0)
+        window.scene = Scene(root, 1400.0, 1000.0)
     }
 
     fun onLoginButtonClick() {

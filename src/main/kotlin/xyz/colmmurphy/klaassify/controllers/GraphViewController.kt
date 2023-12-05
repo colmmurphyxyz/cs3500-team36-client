@@ -5,6 +5,7 @@ import javafx.scene.canvas.Canvas
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
+import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import xyz.colmmurphy.klaassify.StartApplication
@@ -34,6 +35,14 @@ class GraphViewController {
     lateinit var attractionConstantField: TextField
     @FXML
     lateinit var coolingFactorField: TextField
+    @FXML
+    lateinit var numberIterationsField: Text
+    @FXML
+    lateinit var selectedArtistField: Text
+    @FXML
+    lateinit var selectedArtistDegreeField: Text
+    @FXML
+    lateinit var relatedArtistsField: Text
 
     private val graph = StartApplication.artistGraph
 
@@ -156,6 +165,8 @@ class GraphViewController {
         }
     }
 
+    private var mostRecentPositions: Map<Artist, DoubleArray> = mapOf()
+
     private fun drawGraph(p: MutableMap<Artist, DoubleArray>) {
         val drawCoords = mutableMapOf<Artist, DoubleArray>()
         // scale coords
@@ -185,6 +196,8 @@ class GraphViewController {
             drawCoords[artist]!![1] *= scaleY
         }
 
+        mostRecentPositions = drawCoords
+
         // draw edges
         val gc = canvas.graphicsContext2D
         gc.clearRect(0.0, 0.0, canvas.width, canvas.height)
@@ -208,9 +221,10 @@ class GraphViewController {
     private fun renderGraph(): Timer {
         eadesSpringEmbedder.reset()
         val k = 2000
-        return fixedRateTimer("graph render", period = 40L) {
+        return fixedRateTimer("graph render", period = 60L) {
             if (eadesSpringEmbedder.iterationsDone < k) {
                 eadesSpringEmbedder.doOneIteration()
+                numberIterationsField.text = (eadesSpringEmbedder.iterationsDone + 1).toString()
                 drawGraph(eadesSpringEmbedder.positions)
             } else {
                 this.cancel()
@@ -256,5 +270,18 @@ class GraphViewController {
         attractionConstantField.text = eadesSpringEmbedder.cAttr.toString()
         coolingFactorField.text = eadesSpringEmbedder.coolingFactor.toString()
         renderGraph()
+        canvas.addEventFilter(MouseEvent.MOUSE_MOVED) { it ->
+            var selectedArtist: Artist? = null
+            for ((artist, pos) in mostRecentPositions.entries) {
+                if (((it.x - pos[0]) * (it.x - pos[0])) + ((it.y - pos[1]) * (it.y - pos[1])) < 30 * 30) {
+                    selectedArtist = artist
+                }
+            }
+            if (selectedArtist != null) {
+                selectedArtistField.text = selectedArtist.name
+                selectedArtistDegreeField.text = graph.degree(selectedArtist).toString()
+                relatedArtistsField.text = graph.getEdges(selectedArtist).map { e -> e.opposite(selectedArtist) }.joinToString("\n") { (it as Artist).name }
+            }
+        }
     }
 }

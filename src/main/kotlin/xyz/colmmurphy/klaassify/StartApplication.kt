@@ -19,11 +19,11 @@ import java.io.File
 class StartApplication : Application() {
 
     override fun start(primaryStage: Stage) {
-//        loadDummyGraphData(15)
+        loadDummyGraphData(15)
 
         primaryStage.title = "CS3500 Team 36 client"
         val root = FXMLLoader.load<Parent>(Client::class.java.classLoader.getResource("view/main-view.fxml"))
-        primaryStage.scene = Scene(root, 1000.0, 1000.0)
+        primaryStage.scene = Scene(root, 1400.0, 1000.0)
         primaryStage.show()
     }
 
