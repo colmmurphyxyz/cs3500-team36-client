@@ -31,7 +31,7 @@
     </HBox>
 
     <HBox style="-fx-border-color: white; -fx-border-width: 10; -fx-border-style: solid;">
-        <Canvas fx:id="canvas" width="800" height="700">
+        <Canvas fx:id="canvas" width="800" height="650">
         </Canvas>
         <VBox style="-fx-background-color: white; -fx-border-color: white; -fx-border-width: 8; -fx-border-style: solid;">
             <HBox alignment="CENTER" spacing="10">
